@@ -183,6 +183,13 @@ class PhysicalCache extends Cache {
     }
 }
 /*
+    Geocache Tradicional
+    Este é o tipo original de geocache e o mais simples. Estas geocaches serão um 
+    recipiente nas coordenadas fornecidas. O tamanho pode variar, mas no mínimo 
+    todas estas geocaches irão ter um livro de registos. Os recipientes maiores 
+    podem conter itens para troca e trackables.
+
+    TODO
     Tells directly the location
     Can be created -> changable location, temporary, deletable
     The loaded caches cannot be changed or deleted
@@ -194,42 +201,140 @@ class Traditional extends PhysicalCache {
     
 }
 
+/*
+    TODO
+
+    Multi-Cache
+    Estas geocaches envolvem duas ou mais localizações, sendo a localização final um 
+    recipiente físico com um livro de registos. Existem muitas variações, mas a maioria 
+    das Multi-Caches têm uma pista para encontrar o segundo recipiente, a segunda tem uma pista 
+    para o terceiro e por aí adiante.
+*/
 class MultiCache extends PhysicalCache {
 
 }
 
+/*
+    TODO
+
+Geocaches Mistério ou Puzzle
+O tipo mais "geral" dos tipos de caches, esta forma de geocache pode envolver complicados puzzles 
+que tem que ser resolvidos para determinar as coordenadas. As caches Mistério/Puzzle muitas vezes
+ tornam-se o palco de novos tipos de geocache que não cabem em outras categorias.
+*/
 class Mystery extends PhysicalCache {
 
 }
 
+/*
+    TODO
+
+EarthCache
+Uma Earthcache é um local especial que as pessoas podem visitar para aprender alguma característica
+da geociência da nossa Terra. As páginas das EarthCaches incluem uma série de notas educacionais 
+juntamente com as coordenadas do local. Os visitantes das EarthCaches podem ver como o nosso 
+planeta se formou através de processos geológicos, como gerimos os seus recursos e como os 
+cientistas recolhem dados para investigar a Terra. Tipicamente, para registar uma Earthcache, 
+precisa de responder a algumas questões observando uma localização geológica. Para mais informações
+acerca das Earthcaches visite http://www.earthcache.org/.
+*/
 class Earthcache extends Cache {
 
 }
 
+/*
+    TODO
+
+    Evento
+Um Evento é uma reunião de geocachers locais ou de organizações de geocaching. A página do Evento 
+especifica a hora do evento e fornece as coordenadas da sua localização. Depois do evento ter 
+terminado, é arquivado.
+*/
 class Event extends Cache {
 
 }
 
+/*
+    TODO
+
+    Evento Cache In Trash Out (CITO)
+O Cache In Trash Out é a iniciativa ambiental suportada pela comunidade do geocaching. O principal
+objectivo deste programa é limpar e preservar as áreas naturais que apreciamos enquanto praticamos
+geocaching. Estes eventos são encontros de geocachers que se focam na remoção de lixo, remoção de
+espécies invasivas, plantação de árvores e vegetação e construção de trilhos.
+*/
 class CITO extends Cache {
 
 }
 
+/*
+    TODO
+
+    Mega-Evento
+Um Mega-Evento é uma Geocache Evento em que participam mais de 500 pessoas. Muitos Mega-Eventos 
+oferecem aos geocachers um dia de actividades planeadas. Existem muitas vezes vários dias de 
+actividades adicionais à volta de um Mega-Evento. Estes grandes eventos atraem geocachers de todo
+o mundo e normalmente realizam-se anualmente.
+*/
 class Mega extends Cache {
 
 }
 
+/*
+    TODO
+
+    Letterbox Híbrida
+Uma "letterbox" é uma forma de caça ao tesouro, usando pistas em vez de coordenadas. Em alguns 
+casos, porém, o autor criou também uma geocache e publicou as suas coordenadas no Geocaching.com,
+criando uma "letterbox hybrid". Este tipo de caches tem no interior um carimbo que é suposto 
+manter-se no interior do recipiente e que é utilizado apenas para que os praticantes possam 
+registar a sua visita. Para saber mais sobre o letterboxing, visite Letterboxing na América do
+Norte.
+*/
 class Letterbox extends PhysicalCache {
 
 }
 
+/*
+    TODO
+
+    Geocache Virtual
+Uma Geocache Virtual é sobre descobrir uma localização em vez de descobrir um recipiente. 
+Os requisitos para fazer um registo de uma Geocache Virtual variam - pode ser-lhe pedido que
+responda a uma pergunta acerca de uma localização, tirar uma fotografia, completar uma tarefa,
+etc... Em qualquer dos casos, deve visitar as coordenadas antes de poder fazer o seu registo.
+Apesar de muitas localizações serem interessantes, uma Geocache Virtual deve ser invulgar o 
+suficiente para garantir que se registe uma visita.
+
+As Geocaches Virtuais são consideradas waymarks no Waymarking.com.
+*/
 class Virtual extends Cache {
 
 }
 
+/*
+    TODO
+
+    Geocache Webcam
+Estas são geocaches que usam webcams existentes que podem monitorizar várias áreas como parques 
+ou complexos de negócios. A ideia é que consiga ficar à frente da câmara e guardar uma captura 
+de ecrã do site onde a imagem da câmara está a ser exibida de forma a poder registar que a 
+encontrou. Novas geocaches webcam podem ser encontradas na Categoria Web Camera em Waymarking.com.
+*/
 class Webcam extends Cache {
 
 }
 
+/*
+    TODO
+
+    Geocaches Wherigo™
+Wherigo é um conjunto de ferramentas para criar e jogar aventuras com GPS no mundo real. Ao 
+integrar a experiência Wherigo (carregada a partir de um ficheiro denominado "cartucho") com a 
+procura de uma cache, o geocaching torna-se uma actividade ainda mais interessante e rica, 
+permitindo a interacção com elementos físicos e virtuais (objectos e personagens). Para jogar um 
+cartucho Wherigo é necessário um receptor GPS compatível. Mais informações em Wherigo.com.
+*/
 class Wherigo extends Cache {
 
 }
