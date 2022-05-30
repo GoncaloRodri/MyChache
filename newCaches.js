@@ -166,11 +166,25 @@ class Cache extends POI {
 		let pos = [this.latitude, this.longitude];
 		this.marker = L.marker(pos, {icon: map.getIcon(this.kind)});
 		this.marker.bindTooltip(this.name);
-		this.marker.bindPopup("I'm the marker of the cache <b>" + this.name + "</b>.");
+		this.marker.bindPopup(this.getPopupContent());
 		map.add(this.marker);
+	}
+
+	getPopupContent() {
+		return "I'm the marker of the cache <b>" + this.name  + '<p>' +
+		'<button ONCLICK = "openGeocaching(this.code)">Geocaching Site</button>' + '<p>' +
+		'<button ONCLICK = "openStreetView(this.latitude, this.longitude)">Street View</button>';
 	}
 }
 
+function openGeocaching(code) {
+	document.location = "https://coord.info/".concat(code);
+}
+
+//funcional mas nao quer trabalhar
+function openStreetView( latitude, longitude ){
+	document.location = "http://maps.google.com/maps?layer=c&cbll=".concat(toString(latitude), "," ,toString(longitude));
+}
 /* CHACE SUB CLASSES */
 
 /*
@@ -186,6 +200,12 @@ class PhysicalCache extends Cache {
 		this.longitude = longitude;
 		this.latitude = latitude;
     }
+
+	getPopupContent(){
+		return super.getPopupContent() + 
+		'<button ONCLICK = "this.popupLocationChanger()">Change location</button>' ;
+	}
+
 }
 /*
     Geocache Tradicional
@@ -203,13 +223,10 @@ class PhysicalCache extends Cache {
 */
 class Traditional extends PhysicalCache {
 
-    constructor(){
-		super(/*"Traditional.png" */); //!!!
+    constructor(xml){
+		super(xml);
 	}
 
-	createNewCache() {
-		this.installMarker(xml);
-	}	
 }
 
 /*
@@ -374,7 +391,9 @@ class Map {
 		this.addClickHandler(e =>
 			L.popup()
 			.setLatLng(e.latlng)
-			.setContent("You clicked the map at " + e.latlng.toString())
+			.setContent("You clicked the map at " + e.latlng.toString() + 
+			'<button OnClick="">Street View</button>' + '&nbsp;&nbsp;&nbsp;&nbsp;'
+			+'<button OnClick="createNewCache()">Create New Cache</button>')
 		);
 	}
 
@@ -448,15 +467,59 @@ class Map {
 		let xmlDoc = loadXMLDoc(filename);
 		let xs = getAllValuesByTagName(xmlDoc, "cache"); 
 		let caches = [];
+
 		if(xs.length === 0)
 			alert("Empty cache file");
 		else {
 			for(let i = 0 ; i < xs.length ; i++)  // Ignore the disables caches
 				if( getFirstValueByTagName(xs[i], "status") === STATUS_ENABLED )
+					//caches.push(createTypedCache(xs[i]));
 					caches.push(new Cache(xs[i]));
 		}
 		return caches;
 	}
+
+	createTypedCache(cache){
+		let kind = getFirstValueByTagName(cache, "kind");
+		switch(kind){
+			case "Traditional":
+				return new Traditional(cache);
+				break;
+			case "Multi":
+				return new Multi(cache);
+				break;
+			case "Mystery":
+				return new Mystery(cache);
+				break;
+			case "Earthcache":
+				return new Earthcache(cache);
+				break;
+			case "Event":
+				return new Event(cache);
+				break;
+			case "CITO":
+				return new CITO(cache);
+				break;
+			case "Virtual":
+				return new Virtual(cache);
+				break;
+			case "Letterbox":
+				return new Letterbox(cache);
+				break;
+			case "Mega":
+				return new Mega(cache);
+				break;
+			case "Webcam":
+				return new Webcam(cache);
+				break;
+			case "Wherigo":
+				return new Wherigo(cache);
+				break;
+			default:
+				return new Cache(cache);
+		};
+	}
+
 
 	add(marker) {
 		marker.addTo(map.lmap);
@@ -486,5 +549,18 @@ function onLoad()
 	map = new Map(MAP_INITIAL_CENTRE, MAP_INITIAL_ZOOM);
 	map.showFCT();
 	map.populate();
+
+}
+
+function addAutoCache(){
+
+}
+
+function addManualCache(){
+
+}
+
+function delTradCache(){
+
 }
 
