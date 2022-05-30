@@ -178,8 +178,13 @@ class Cache extends POI {
 */
 class PhysicalCache extends Cache {
 
-    setNewCoordenates(){
+	constructor(xml) { 
+		super(xml);
+	}
 
+    setNewPosition(longitude, latitude) {
+		this.longitude = longitude;
+		this.latitude = latitude;
     }
 }
 /*
@@ -198,7 +203,13 @@ class PhysicalCache extends Cache {
 */
 class Traditional extends PhysicalCache {
 
-    
+    constructor(){
+		super(/*"Traditional.png" */); //!!!
+	}
+
+	createNewCache() {
+		this.installMarker(xml);
+	}	
 }
 
 /*
