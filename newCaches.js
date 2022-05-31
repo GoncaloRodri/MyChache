@@ -255,6 +255,9 @@ que tem que ser resolvidos para determinar as coordenadas. As caches Mistério/P
 */
 class Mystery extends PhysicalCache {
 
+	contructor(xml) {
+		super(xml);
+	}
 }
 
 /*
@@ -271,6 +274,9 @@ acerca das Earthcaches visite http://www.earthcache.org/.
 */
 class Earthcache extends Cache {
 
+	contructor(xml) {
+		super(xml);
+	}
 }
 
 /*
@@ -283,6 +289,9 @@ terminado, é arquivado.
 */
 class Event extends Cache {
 
+	contructor(xml) {
+		super(xml);
+	}
 }
 
 /*
@@ -296,6 +305,9 @@ espécies invasivas, plantação de árvores e vegetação e construção de tri
 */
 class CITO extends Cache {
 
+	contructor(xml) {
+		super(xml);
+	}
 }
 
 /*
@@ -309,6 +321,9 @@ o mundo e normalmente realizam-se anualmente.
 */
 class Mega extends Cache {
 
+	contructor(xml) {
+		super(xml);
+	}
 }
 
 /*
@@ -324,6 +339,9 @@ Norte.
 */
 class Letterbox extends PhysicalCache {
 
+	contructor(xml) {
+		super(xml);
+	}
 }
 
 /*
@@ -340,6 +358,10 @@ suficiente para garantir que se registe uma visita.
 As Geocaches Virtuais são consideradas waymarks no Waymarking.com.
 */
 class Virtual extends Cache {
+	
+	contructor(xml) {
+		super(xml);
+	}
 
 }
 
@@ -354,6 +376,9 @@ encontrou. Novas geocaches webcam podem ser encontradas na Categoria Web Camera 
 */
 class Webcam extends Cache {
 
+	contructor(xml) {
+		super(xml);
+	}
 }
 
 /*
@@ -368,6 +393,9 @@ cartucho Wherigo é necessário um receptor GPS compatível. Mais informações 
 */
 class Wherigo extends Cache {
 
+	contructor(xml) {
+		super(xml);
+	}	
 }
 
 
