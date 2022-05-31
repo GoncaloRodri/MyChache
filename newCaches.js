@@ -238,8 +238,11 @@ class Traditional extends PhysicalCache {
     das Multi-Caches têm uma pista para encontrar o segundo recipiente, a segunda tem uma pista 
     para o terceiro e por aí adiante.
 */
-class MultiCache extends PhysicalCache {
+class Multi extends PhysicalCache {
 
+	constructor(xml) {
+		super(xml);
+	}
 }
 
 /*
