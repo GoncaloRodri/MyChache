@@ -1,7 +1,7 @@
 /* New Caches
 
-Aluno 1: ?number ?name <-- mandatory to fill
-Aluno 2: ?number ?name <-- mandatory to fill
+Aluno 1: 59837 Bárbara Correia
+Aluno 2: 60044 Gonçalo Rodrigues 
 
 Comment:
 
@@ -24,7 +24,7 @@ Leaflet documentation: https://leafletjs.com/reference.html
 /* GLOBAL CONSTANTS */
 
 const MAP_INITIAL_CENTRE =
-	[38.661,-9.2044];  // FCT coordinates
+	[38.661, -9.2044];  // FCT coordinates
 const MAP_INITIAL_ZOOM =
 	14
 const MAP_ID =
@@ -43,7 +43,7 @@ const MAP_LAYERS =
 //const RESOURCES_DIR =
 //	"http//ctp.di.fct.unl.pt/lei/lap/projs/proj2122-3/resources/";
 const RESOURCES_DIR =
- 	"resources/";
+	"resources/";
 const CACHE_KINDS = ["CITO", "Earthcache", "Event",
 	"Letterbox", "Mega", "Multi", "Mystery", "Other",
 	"Traditional", "Virtual", "Webcam", "Wherigo"];
@@ -64,43 +64,40 @@ let map = null;
 /* USEFUL FUNCTIONS */
 
 // Capitalize the first letter of a string.
-function capitalize(str)
-{
+function capitalize(str) {
 	return str.length > 0
-			? str[0].toUpperCase() + str.slice(1)
-			: str;
+		? str[0].toUpperCase() + str.slice(1)
+		: str;
 }
 
 // Distance in km between to pairs of coordinates over the earth's surface.
 // https://en.wikipedia.org/wiki/Haversine_formula
-function haversine(lat1, lon1, lat2, lon2)
-{
-    function toRad(deg) { return deg * 3.1415926535898 / 180.0; }
-    let dLat = toRad(lat2 - lat1), dLon = toRad (lon2 - lon1);
-    let sa = Math.sin(dLat / 2.0), so = Math.sin(dLon / 2.0);
-    let a = sa * sa + so * so * Math.cos(toRad(lat1)) * Math.cos(toRad(lat2));
-    return 6372.8 * 2.0 * Math.asin (Math.sqrt(a));
+function haversine(lat1, lon1, lat2, lon2) {
+	function toRad(deg) { return deg * 3.1415926535898 / 180.0; }
+	let dLat = toRad(lat2 - lat1), dLon = toRad(lon2 - lon1);
+	let sa = Math.sin(dLat / 2.0), so = Math.sin(dLon / 2.0);
+	let a = sa * sa + so * so * Math.cos(toRad(lat1)) * Math.cos(toRad(lat2));
+	return 6372.8 * 2.0 * Math.asin(Math.sqrt(a));
 }
 
-function loadXMLDoc(filename)
-{
+function loadXMLDoc(filename) {
 	let xhttp = new XMLHttpRequest();
 	xhttp.open("GET", filename, false);
 	try {
 		xhttp.send();
 	}
-	catch(err) {
+	catch (err) {
 		alert("Could not access the geocaching database via AJAX.\n"
 			+ "Therefore, no POIs will be visible.\n");
 	}
-	return xhttp.responseXML;	
+	return xhttp.responseXML;
 }
 
-function getAllValuesByTagName(xml, name)  {
+function getAllValuesByTagName(xml, name) {
 	return xml.getElementsByTagName(name);
 }
 
-function getFirstValueByTagName(xml, name)  {
+function getFirstValueByTagName(xml, name) {
 	return getAllValuesByTagName(xml, name)[0].childNodes[0].nodeValue;
 }
 
@@ -117,7 +114,7 @@ class POI {
 	}
 
 	decodeXML(xml) {
-		if(xml === null)
+		if (xml === null)
 			return;
 		this.name = getFirstValueByTagName(xml, "name");
 		this.latitude = getFirstValueByTagName(xml, "latitude");
@@ -126,10 +123,10 @@ class POI {
 
 	installCircle(radius, color) {
 		let pos = [this.latitude, this.longitude];
-		let style = {color: color, fillColor: color, weight: 1, fillOpacity: 0.1};
+		let style = { color: color, fillColor: color, weight: 1, fillOpacity: 0.1 };
 		this.circle = L.circle(pos, radius, style);
 		this.circle.bindTooltip(this.name);
-		map.add(this.circle);	
+		map.add(this.circle);
 	}
 }
 
@@ -164,89 +161,134 @@ class Cache extends POI {
 
 	installMarker() {
 		let pos = [this.latitude, this.longitude];
-		this.marker = L.marker(pos, {icon: map.getIcon(this.kind)});
+		this.marker = L.marker(pos, { icon: map.getIcon(this.kind) });
 		this.marker.bindTooltip(this.name);
+
 		this.marker.bindPopup(this.getPopupContent());
 		map.add(this.marker);
 	}
 
 	getPopupContent() {
-		return "I'm the marker of the cache <b>" + this.name  + '<p>' +
-		'<button ONCLICK = "openGeocaching(this.code)">Geocaching Site</button>' + '<p>' +
-		'<button ONCLICK = "openStreetView(this.latitude, this.longitude)">Street View</button>';
+		let name = this.name;
+		let latitude = this.latitude;
+		let longitude = this.longitude;
+		let owner = this.owner;
+		let size = this.size;
+		let difficulty = this.difficulty;
+		let code = this.code;
+		let form =
+			`<FORM>
+				<H></H>
+				<P>
+				I'm the marker of the cache <b> ${name} </b><p> 
+				<b> Latitude: </b> ${latitude} <p>  
+				<b> Longitude: </b> ${longitude} '<p> 
+				<b> Owner: </b>${owner} <p>  
+				<b> Size: </b> ${size} <p> 
+				<b> Difficulty: </b> ${difficulty} <p> 
+				<P>
+				<INPUT TYPE="button" VALUE="Geocaching" ONCLICK="openGeocaching('${code}');">
+				<INPUT TYPE="button" VALUE="Street view" ONCLICK="openStreetView('${latitude}', '${longitude}');">
+			 </FORM>`
+
+		return form;
 	}
 }
 
 function openGeocaching(code) {
+	alert("Going to geocaching");
 	document.location = "https://coord.info/".concat(code);
 }
 
 //funcional mas nao quer trabalhar
-function openStreetView( latitude, longitude ){
-	document.location = "http://maps.google.com/maps?layer=c&cbll=".concat(toString(latitude), "," ,toString(longitude));
+function openStreetView(latitude, longitude) {
+	alert("Going to street view");
+	document.location = "http://maps.google.com/maps?layer=c&cbll=".concat(latitude, ",", longitude);
 }
 /* CHACE SUB CLASSES */
 
 /*
-    Can have their location changed    
+	Can have their location changed    
 */
 class PhysicalCache extends Cache {
 
-	constructor(xml) { 
+	constructor(xml) {
 		super(xml);
 	}
 
-    setNewPosition(longitude, latitude) {
+	setNewPosition(longitude, latitude) {
 		this.longitude = longitude;
 		this.latitude = latitude;
-    }
+	}
 
-	getPopupContent(){
-		return super.getPopupContent() + 
-		'<button ONCLICK = "this.popupLocationChanger()">Change location</button>' ;
+	getPopupContent() {
+		let name = this.name;
+		let latitude = this.latitude;
+		let longitude = this.longitude;
+		let owner = this.owner;
+		let size = this.size;
+		let difficulty = this.difficulty;
+		let code = this.code;
+		let form =
+			`<FORM>
+		<H3>I'm the marker of the cache ${name} </H3>
+		<P>
+		<b> Latitude: </b> ${latitude} <p>  
+		<b> Longitude: </b> ${longitude} '<p> 
+		<b> Owner: </b>${owner} <p>  
+		<b> Size: </b> ${size} <p> 
+		<b> Difficulty: </b> ${difficulty} <p> 
+		<P>
+		<INPUT TYPE="button" VALUE="Geocaching" ONCLICK="openGeocaching('${code}');">
+		<P>
+		<INPUT TYPE="button" VALUE="Street view" ONCLICK="openStreetView('${latitude}', '${longitude}');">
+		<P>
+		<INPUT TYPE="button" VALUE="Change location" ONCLICK="changeLocation(${this});">
+	 </FORM>`
+
+		return form;
 	}
 
 }
 /*
-    Geocache Tradicional
-    Este é o tipo original de geocache e o mais simples. Estas geocaches serão um 
-    recipiente nas coordenadas fornecidas. O tamanho pode variar, mas no mínimo 
-    todas estas geocaches irão ter um livro de registos. Os recipientes maiores 
-    podem conter itens para troca e trackables.
+	Geocache Tradicional
+	Este é o tipo original de geocache e o mais simples. Estas geocaches serão um 
+	recipiente nas coordenadas fornecidas. O tamanho pode variar, mas no mínimo 
+	todas estas geocaches irão ter um livro de registos. Os recipientes maiores 
+	podem conter itens para troca e trackables.
 
-    TODO
-    Tells directly the location
-    Can be created -> changable location, temporary, deletable
-    The loaded caches cannot be changed or deleted
-    Physical known location 
-    Must be in a 400 meters range whithin other loaded cache but not 161 meters or less
+	TODO
+	Tells directly the location
+	Can be created -> changable location, temporary, deletable
+	The loaded caches cannot be changed or deleted
+	Physical known location 
+	Must be in a 400 meters range whithin other loaded cache but not 161 meters or less
 */
 class Traditional extends PhysicalCache {
 
-    constructor(xml){
+	constructor(xml) {
 		super(xml);
 	}
 
 }
 
 /*
-    TODO
+	TODO
 
-    Multi-Cache
-    Estas geocaches envolvem duas ou mais localizações, sendo a localização final um 
-    recipiente físico com um livro de registos. Existem muitas variações, mas a maioria 
-    das Multi-Caches têm uma pista para encontrar o segundo recipiente, a segunda tem uma pista 
-    para o terceiro e por aí adiante.
+	Multi-Cache
+	Estas geocaches envolvem duas ou mais localizações, sendo a localização final um 
+	recipiente físico com um livro de registos. Existem muitas variações, mas a maioria 
+	das Multi-Caches têm uma pista para encontrar o segundo recipiente, a segunda tem uma pista 
+	para o terceiro e por aí adiante.
 */
 class Multi extends PhysicalCache {
-
 	constructor(xml) {
 		super(xml);
 	}
 }
 
 /*
-    TODO
+	TODO
 
 Geocaches Mistério ou Puzzle
 O tipo mais "geral" dos tipos de caches, esta forma de geocache pode envolver complicados puzzles 
@@ -255,13 +297,13 @@ que tem que ser resolvidos para determinar as coordenadas. As caches Mistério/P
 */
 class Mystery extends PhysicalCache {
 
-	contructor(xml) {
+	constructor(xml) {
 		super(xml);
 	}
 }
 
 /*
-    TODO
+	TODO
 
 EarthCache
 Uma Earthcache é um local especial que as pessoas podem visitar para aprender alguma característica
@@ -273,63 +315,59 @@ precisa de responder a algumas questões observando uma localização geológica
 acerca das Earthcaches visite http://www.earthcache.org/.
 */
 class Earthcache extends Cache {
-
-	contructor(xml) {
+	constructor(xml) {
 		super(xml);
 	}
 }
 
 /*
-    TODO
+	TODO
 
-    Evento
+	Evento
 Um Evento é uma reunião de geocachers locais ou de organizações de geocaching. A página do Evento 
 especifica a hora do evento e fornece as coordenadas da sua localização. Depois do evento ter 
 terminado, é arquivado.
 */
 class Event extends Cache {
-
-	contructor(xml) {
+	constructor(xml) {
 		super(xml);
 	}
 }
 
 /*
-    TODO
+	TODO
 
-    Evento Cache In Trash Out (CITO)
+	Evento Cache In Trash Out (CITO)
 O Cache In Trash Out é a iniciativa ambiental suportada pela comunidade do geocaching. O principal
 objectivo deste programa é limpar e preservar as áreas naturais que apreciamos enquanto praticamos
 geocaching. Estes eventos são encontros de geocachers que se focam na remoção de lixo, remoção de
 espécies invasivas, plantação de árvores e vegetação e construção de trilhos.
 */
 class CITO extends Cache {
-
-	contructor(xml) {
+	constructor(xml) {
 		super(xml);
 	}
 }
 
 /*
-    TODO
+	TODO
 
-    Mega-Evento
+	Mega-Evento
 Um Mega-Evento é uma Geocache Evento em que participam mais de 500 pessoas. Muitos Mega-Eventos 
 oferecem aos geocachers um dia de actividades planeadas. Existem muitas vezes vários dias de 
 actividades adicionais à volta de um Mega-Evento. Estes grandes eventos atraem geocachers de todo
 o mundo e normalmente realizam-se anualmente.
 */
 class Mega extends Cache {
-
-	contructor(xml) {
+	constructor(xml) {
 		super(xml);
 	}
 }
 
 /*
-    TODO
+	TODO
 
-    Letterbox Híbrida
+	Letterbox Híbrida
 Uma "letterbox" é uma forma de caça ao tesouro, usando pistas em vez de coordenadas. Em alguns 
 casos, porém, o autor criou também uma geocache e publicou as suas coordenadas no Geocaching.com,
 criando uma "letterbox hybrid". Este tipo de caches tem no interior um carimbo que é suposto 
@@ -338,16 +376,15 @@ registar a sua visita. Para saber mais sobre o letterboxing, visite Letterboxing
 Norte.
 */
 class Letterbox extends PhysicalCache {
-
-	contructor(xml) {
+	constructor(xml) {
 		super(xml);
 	}
 }
 
 /*
-    TODO
+	TODO
 
-    Geocache Virtual
+	Geocache Virtual
 Uma Geocache Virtual é sobre descobrir uma localização em vez de descobrir um recipiente. 
 Os requisitos para fazer um registo de uma Geocache Virtual variam - pode ser-lhe pedido que
 responda a uma pergunta acerca de uma localização, tirar uma fotografia, completar uma tarefa,
@@ -358,33 +395,30 @@ suficiente para garantir que se registe uma visita.
 As Geocaches Virtuais são consideradas waymarks no Waymarking.com.
 */
 class Virtual extends Cache {
-	
-	contructor(xml) {
+	constructor(xml) {
 		super(xml);
 	}
-
 }
 
 /*
-    TODO
+	TODO
 
-    Geocache Webcam
+	Geocache Webcam
 Estas são geocaches que usam webcams existentes que podem monitorizar várias áreas como parques 
 ou complexos de negócios. A ideia é que consiga ficar à frente da câmara e guardar uma captura 
 de ecrã do site onde a imagem da câmara está a ser exibida de forma a poder registar que a 
 encontrou. Novas geocaches webcam podem ser encontradas na Categoria Web Camera em Waymarking.com.
 */
 class Webcam extends Cache {
-
-	contructor(xml) {
+	constructor(xml) {
 		super(xml);
 	}
 }
 
 /*
-    TODO
+	TODO
 
-    Geocaches Wherigo™
+	Geocaches Wherigo™
 Wherigo é um conjunto de ferramentas para criar e jogar aventuras com GPS no mundo real. Ao 
 integrar a experiência Wherigo (carregada a partir de um ficheiro denominado "cartucho") com a 
 procura de uma cache, o geocaching torna-se uma actividade ainda mais interessante e rica, 
@@ -392,10 +426,9 @@ permitindo a interacção com elementos físicos e virtuais (objectos e personag
 cartucho Wherigo é necessário um receptor GPS compatível. Mais informações em Wherigo.com.
 */
 class Wherigo extends Cache {
-
-	contructor(xml) {
+	constructor(xml) {
 		super(xml);
-	}	
+	}
 }
 
 
@@ -421,11 +454,29 @@ class Map {
 		this.caches = [];
 		this.addClickHandler(e =>
 			L.popup()
-			.setLatLng(e.latlng)
-			.setContent("You clicked the map at " + e.latlng.toString() + 
-			'<button OnClick="">Street View</button>' + '&nbsp;&nbsp;&nbsp;&nbsp;'
-			+'<button OnClick="createNewCache()">Create New Cache</button>')
+				.setLatLng(e.latlng)
+				.setContent("You clicked the map at " + e.latlng.toString() +
+					'<button OnClick= openStreetView()"">Street View</button>' + '&nbsp;&nbsp;&nbsp;&nbsp;'
+					+ '<button OnClick="createNewCache(e.latlng.toString())">Create New Cache</button>')
 		);
+
+		// ! Fazer split de latlng para ter latitude e longitude, e introduzir nos argumentos
+		// ! Fazer um form
+	}
+
+	getContent(latlng) {
+		let array = latlng.split(', ');
+		let lat = array[0];
+		let lng = array[1];
+		let form = `<FORM>
+		<b> Latitude: </b> ${latitude} <p>  
+		<b> Longitude: </b> ${longitude} '
+		<P>
+		<INPUT TYPE="button" VALUE="Street view" ONCLICK="openStreetView('${latitude}', '${longitude}');">
+		<P>
+		<INPUT TYPE="button" VALUE="Create new Cache" ONCLICK="changeLocation(${this});">
+	 </FORM>`
+		return form;
 	}
 
 	populate() {
@@ -450,25 +501,25 @@ class Map {
 		let errorTileUrl = MAP_ERROR;
 		let layer =
 			L.tileLayer(urlTemplate, {
-					minZoom: 6,
-					maxZoom: 19,
-					errorTileUrl: errorTileUrl,
-					id: spec,
-					tileSize: 512,
-					zoomOffset: -1,
-					attribution: attr
+				minZoom: 6,
+				maxZoom: 19,
+				errorTileUrl: errorTileUrl,
+				id: spec,
+				tileSize: 512,
+				zoomOffset: -1,
+				attribution: attr
 			});
 		return layer;
 	}
 
 	addBaseLayers(specs) {
 		let baseMaps = [];
-		for(let i in specs)
+		for (let i in specs)
 			baseMaps[capitalize(specs[i])] =
 				this.makeMapLayer(specs[i], "mapbox/" + specs[i]);
 		baseMaps[capitalize(specs[0])].addTo(this.lmap);
-		L.control.scale({maxWidth: 150, metric: true, imperial: false})
-									.setPosition("topleft").addTo(this.lmap);
+		L.control.scale({ maxWidth: 150, metric: true, imperial: false })
+			.setPosition("topleft").addTo(this.lmap);
 		L.control.layers(baseMaps, {}).setPosition("topleft").addTo(this.lmap);
 		return baseMaps;
 	}
@@ -484,7 +535,7 @@ class Map {
 			shadowAnchor: [8, 8],
 			popupAnchor: [0, -6] // offset the determines where the popup should open
 		};
-		for(let i = 0 ; i < CACHE_KINDS.length ; i++) {
+		for (let i = 0; i < CACHE_KINDS.length; i++) {
 			iconOptions.iconUrl = dir + CACHE_KINDS[i] + ".png";
 			iconOptions.shadowUrl = dir + "Alive.png";
 			icons[CACHE_KINDS[i]] = L.icon(iconOptions);
@@ -496,60 +547,67 @@ class Map {
 
 	loadCaches(filename) {
 		let xmlDoc = loadXMLDoc(filename);
-		let xs = getAllValuesByTagName(xmlDoc, "cache"); 
+		let xs = getAllValuesByTagName(xmlDoc, "cache");
 		let caches = [];
-
-		if(xs.length === 0)
+		let kind = '';
+		let c;
+		if (xs.length === 0)
 			alert("Empty cache file");
 		else {
-			for(let i = 0 ; i < xs.length ; i++)  // Ignore the disables caches
-				if( getFirstValueByTagName(xs[i], "status") === STATUS_ENABLED )
-					//caches.push(createTypedCache(xs[i]));
-					caches.push(new Cache(xs[i]));
+			for (let i = 0; i < xs.length; i++) { // Ignore the disables caches
+				if (getFirstValueByTagName(xs[i], "status") === STATUS_ENABLED) {
+					kind = getFirstValueByTagName(xs[i], "kind");
+					//alert("KIND: " + kind);
+					switch (kind) {
+						case 'Traditional':
+							c = new Traditional(xs[i]);
+							c.installCircle(CACHE_RADIUS, 'red');
+							caches.push(c);
+							break;
+						case 'Multi':
+							c = new Multi(xs[i]);
+							c.installCircle(CACHE_RADIUS, 'red');
+							caches.push(c);
+							break;
+						case 'Mystery':
+							c = new Mystery(xs[i]);
+							c.installCircle(CACHE_RADIUS, 'red');
+							caches.push(c);
+							break;
+						case 'Earthcache':
+							caches.push(new Earthcache(xs[i]));
+							break;
+						case 'Event':
+							caches.push(new Event(xs[i]));
+							break;
+						case 'CITO':
+							caches.push(new CITO(xs[i]));
+							break;
+						case 'Virtual':
+							caches.push(new Virtual(xs[i]));
+							break;
+						case 'Letterbox':
+							caches.push(new Letterbox(xs[i]));
+							break;
+						case 'Mega':
+							caches.push(new Mega(xs[i]));
+							break;
+						case 'Webcam':
+							caches.push(new Webcam(xs[i]));
+							break;
+						case 'Wherigo':
+							caches.push(new Wherigo(xs[i]));
+							break;
+						default:
+							caches.push(new Cache(xs[i]));
+					}
+				}
+			}
 		}
 		return caches;
 	}
 
-	createTypedCache(cache){
-		let kind = getFirstValueByTagName(cache, "kind");
-		switch(kind){
-			case "Traditional":
-				return new Traditional(cache);
-				break;
-			case "Multi":
-				return new Multi(cache);
-				break;
-			case "Mystery":
-				return new Mystery(cache);
-				break;
-			case "Earthcache":
-				return new Earthcache(cache);
-				break;
-			case "Event":
-				return new Event(cache);
-				break;
-			case "CITO":
-				return new CITO(cache);
-				break;
-			case "Virtual":
-				return new Virtual(cache);
-				break;
-			case "Letterbox":
-				return new Letterbox(cache);
-				break;
-			case "Mega":
-				return new Mega(cache);
-				break;
-			case "Webcam":
-				return new Webcam(cache);
-				break;
-			case "Wherigo":
-				return new Wherigo(cache);
-				break;
-			default:
-				return new Cache(cache);
-		};
-	}
+
 
 
 	add(marker) {
@@ -575,23 +633,23 @@ class Map {
    this program must be written using the object-oriented style.
 */
 
-function onLoad()
-{
+
+function onLoad() {
 	map = new Map(MAP_INITIAL_CENTRE, MAP_INITIAL_ZOOM);
 	map.showFCT();
 	map.populate();
 
 }
 
-function addAutoCache(){
+function addAutoCache() {
 
 }
 
-function addManualCache(){
+function addManualCache() {
 
 }
 
-function delTradCache(){
+function delTradCache() {
 
 }
 
