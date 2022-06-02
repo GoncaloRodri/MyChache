@@ -53,10 +53,10 @@ input { padding: 0; margin: 0;}
 
 
 <HR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="button" ID="addCache" VALUE="Add random Cache" ONCLICK="addRandCache()"> <P></P>
-   &nbsp;&nbsp;&nbsp;&nbsp;
-   <INPUT TYPE="button" ID="addCache" VALUE="Add Traditional Cache" ONCLICK="addTradCache()"> <P></P>
-   &nbsp;&nbsp;&nbsp;&nbsp;
-   <INPUT TYPE="button" ID="addCache" VALUE="Delete Traditional Cache" ONCLICK="delTradCache()"> 
+<HR> <P>&nbsp;&nbsp;&nbsp;&nbsp; <INPUT TYPE="number" INPUTMODE= "decimal" STEP="0.000001" ID="latitude" placeholder="Insert latitude"> </P>
+   <P>&nbsp;&nbsp;&nbsp;&nbsp; <INPUT TYPE="number" INPUTMODE= "decimal" STEP="0.000001" ID="longitude" placeholder="Insert longitude"> </P>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="button" ID="addCache" VALUE="Add Traditional Cache" ONCLICK="addManualCache(latitude.value,longitude.value)"> <P></P>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="button" ID="addCache" VALUE="Delete Traditional Cache" ONCLICK="delTradCache(latitude.value,longitude.value)"> 
 <br />
 
 
