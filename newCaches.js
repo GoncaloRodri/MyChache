@@ -257,20 +257,7 @@ class PhysicalCache extends Cache {
 	}
 
 }
-/*
-	Geocache Tradicional
-	Este é o tipo original de geocache e o mais simples. Estas geocaches serão um 
-	recipiente nas coordenadas fornecidas. O tamanho pode variar, mas no mínimo 
-	todas estas geocaches irão ter um livro de registos. Os recipientes maiores 
-	podem conter itens para troca e trackables.
 
-	TODO
-	Tells directly the location
-	Can be created -> changable location, temporary, deletable
-	The loaded caches cannot be changed or deleted
-	Physical known location 
-	Must be in a 400 meters range whithin other loaded cache but not 161 meters or less
-*/
 class Traditional extends PhysicalCache {
 
 	constructor(xml) {
@@ -278,29 +265,80 @@ class Traditional extends PhysicalCache {
 	}
 }
 
-/*
-	TODO
+class CustomTraditional extends Traditional {
+	constructor(xml) {
+		super(xml);
+	}
 
-	Multi-Cache
-	Estas geocaches envolvem duas ou mais localizações, sendo a localização final um 
-	recipiente físico com um livro de registos. Existem muitas variações, mas a maioria 
-	das Multi-Caches têm uma pista para encontrar o segundo recipiente, a segunda tem uma pista 
-	para o terceiro e por aí adiante.
-*/
+	getPopupContent(){
+		let name = this.name;
+		let latitude = this.latitude;
+		let longitude = this.longitude;
+		let owner = this.owner;
+		let size = this.size;
+		let difficulty = this.difficulty;
+		let code = this.code;
+		let form =
+			`<FORM>
+		<H3>I'm the marker of the cache ${name} </H3>
+		<P>
+		<b> Latitude: </b> ${latitude} <p>  
+		<b> Longitude: </b> ${longitude} <p> 
+		<b> Owner: </b>${owner} <p>  
+		<b> Size: </b> ${size} <p> 
+		<b> Difficulty: </b> ${difficulty} <p> 
+		<P>
+		<INPUT TYPE="button" VALUE="Geocaching" ONCLICK="openGeocaching('${code}');">
+		<P>
+		<INPUT TYPE="button" VALUE="Street view" ONCLICK="openStreetView('${latitude}', '${longitude}');">
+		<P>
+		<INPUT TYPE="button" VALUE="Delete Cache" ONCLICK="delTradCache('${latitude}', '${longitude}')">
+		<P>
+		<INPUT TYPE="button" VALUE="Change location" ONCLICK="changeLocation(${this});">
+	 </FORM>`
+	
+		return form;
+	}
+}
+
+
 class Multi extends PhysicalCache {
 	constructor(xml) {
 		super(xml);
 	}
+
+	getPopupContent(){
+		let name = this.name;
+		let latitude = this.latitude;
+		let longitude = this.longitude;
+		let owner = this.owner;
+		let size = this.size;
+		let difficulty = this.difficulty;
+		let code = this.code;
+		let cache = this;
+		let form =
+			`<FORM>
+		<H3>I'm the marker of the cache ${name} </H3>
+		<P>
+		<b> Latitude: </b> ${latitude} <p>  
+		<b> Longitude: </b> ${longitude} <p> 
+		<b> Owner: </b>${owner} <p>  
+		<b> Size: </b> ${size} <p> 
+		<b> Difficulty: </b> ${difficulty} <p> 
+		<P>
+		<INPUT TYPE="button" VALUE="Geocaching" ONCLICK="openGeocaching('${code}');">
+		<P>
+		<INPUT TYPE="button" VALUE="Street view" ONCLICK="openStreetView('${latitude}', '${longitude}');">
+		<P>
+		<INPUT TYPE="text" ID="lat" PLACEHOLDER="Insert new Latitude"><p>
+		<INPUT TYPE="text" ID="lon" PLACEHOLDER="Insert new Longitude"><p>
+		<INPUT TYPE="button" VALUE="Change location" ONCLICK=" changeLocation(${cache}, form.lat.value, form.lon.value);">
+	 </FORM>`
+
+		return form;
+	}
 }
 
-/*
-	TODO
-
-Geocaches Mistério ou Puzzle
-O tipo mais "geral" dos tipos de caches, esta forma de geocache pode envolver complicados puzzles 
-que tem que ser resolvidos para determinar as coordenadas. As caches Mistério/Puzzle muitas vezes
- tornam-se o palco de novos tipos de geocache que não cabem em outras categorias.
-*/
 class Mystery extends PhysicalCache {
 
 	constructor(xml) {
@@ -308,129 +346,52 @@ class Mystery extends PhysicalCache {
 	}
 }
 
-/*
-	TODO
 
-EarthCache
-Uma Earthcache é um local especial que as pessoas podem visitar para aprender alguma característica
-da geociência da nossa Terra. As páginas das EarthCaches incluem uma série de notas educacionais 
-juntamente com as coordenadas do local. Os visitantes das EarthCaches podem ver como o nosso 
-planeta se formou através de processos geológicos, como gerimos os seus recursos e como os 
-cientistas recolhem dados para investigar a Terra. Tipicamente, para registar uma Earthcache, 
-precisa de responder a algumas questões observando uma localização geológica. Para mais informações
-acerca das Earthcaches visite http://www.earthcache.org/.
-*/
 class Earthcache extends Cache {
 	constructor(xml) {
 		super(xml);
 	}
 }
 
-/*
-	TODO
 
-	Evento
-Um Evento é uma reunião de geocachers locais ou de organizações de geocaching. A página do Evento 
-especifica a hora do evento e fornece as coordenadas da sua localização. Depois do evento ter 
-terminado, é arquivado.
-*/
 class Event extends Cache {
 	constructor(xml) {
 		super(xml);
 	}
 }
 
-/*
-	TODO
 
-	Evento Cache In Trash Out (CITO)
-O Cache In Trash Out é a iniciativa ambiental suportada pela comunidade do geocaching. O principal
-objectivo deste programa é limpar e preservar as áreas naturais que apreciamos enquanto praticamos
-geocaching. Estes eventos são encontros de geocachers que se focam na remoção de lixo, remoção de
-espécies invasivas, plantação de árvores e vegetação e construção de trilhos.
-*/
 class CITO extends Cache {
 	constructor(xml) {
 		super(xml);
 	}
 }
 
-/*
-	TODO
 
-	Mega-Evento
-Um Mega-Evento é uma Geocache Evento em que participam mais de 500 pessoas. Muitos Mega-Eventos 
-oferecem aos geocachers um dia de actividades planeadas. Existem muitas vezes vários dias de 
-actividades adicionais à volta de um Mega-Evento. Estes grandes eventos atraem geocachers de todo
-o mundo e normalmente realizam-se anualmente.
-*/
 class Mega extends Cache {
 	constructor(xml) {
 		super(xml);
 	}
 }
 
-/*
-	TODO
-
-	Letterbox Híbrida
-Uma "letterbox" é uma forma de caça ao tesouro, usando pistas em vez de coordenadas. Em alguns 
-casos, porém, o autor criou também uma geocache e publicou as suas coordenadas no Geocaching.com,
-criando uma "letterbox hybrid". Este tipo de caches tem no interior um carimbo que é suposto 
-manter-se no interior do recipiente e que é utilizado apenas para que os praticantes possam 
-registar a sua visita. Para saber mais sobre o letterboxing, visite Letterboxing na América do
-Norte.
-*/
 class Letterbox extends PhysicalCache {
 	constructor(xml) {
 		super(xml);
 	}
 }
 
-/*
-	TODO
-
-	Geocache Virtual
-Uma Geocache Virtual é sobre descobrir uma localização em vez de descobrir um recipiente. 
-Os requisitos para fazer um registo de uma Geocache Virtual variam - pode ser-lhe pedido que
-responda a uma pergunta acerca de uma localização, tirar uma fotografia, completar uma tarefa,
-etc... Em qualquer dos casos, deve visitar as coordenadas antes de poder fazer o seu registo.
-Apesar de muitas localizações serem interessantes, uma Geocache Virtual deve ser invulgar o 
-suficiente para garantir que se registe uma visita.
-
-As Geocaches Virtuais são consideradas waymarks no Waymarking.com.
-*/
 class Virtual extends Cache {
 	constructor(xml) {
 		super(xml);
 	}
 }
 
-/*
-	TODO
-
-	Geocache Webcam
-Estas são geocaches que usam webcams existentes que podem monitorizar várias áreas como parques 
-ou complexos de negócios. A ideia é que consiga ficar à frente da câmara e guardar uma captura 
-de ecrã do site onde a imagem da câmara está a ser exibida de forma a poder registar que a 
-encontrou. Novas geocaches webcam podem ser encontradas na Categoria Web Camera em Waymarking.com.
-*/
 class Webcam extends Cache {
 	constructor(xml) {
 		super(xml);
 	}
 }
 
-/*
-	TODO
-
-	Geocaches Wherigo™
-Wherigo é um conjunto de ferramentas para criar e jogar aventuras com GPS no mundo real. Ao 
-integrar a experiência Wherigo (carregada a partir de um ficheiro denominado "cartucho") com a 
-procura de uma cache, o geocaching torna-se uma actividade ainda mais interessante e rica, 
-permitindo a interacção com elementos físicos e virtuais (objectos e personagens). Para jogar um 
-cartucho Wherigo é necessário um receptor GPS compatível. Mais informações em Wherigo.com.
-*/
 class Wherigo extends Cache {
 	constructor(xml) {
 		super(xml);
@@ -532,7 +493,7 @@ class Map {
 		  <last_log>2000/01/01</last_log>
 		</cache>`;
 			let xml = txt2xml(txt);
-			let c = new Traditional(xml);
+			let c = new CustomTraditional(xml);
 			c.installCircle(CACHE_RADIUS, color);
 			this.addedCaches.push(c); //!! NAO ESTA A FAZER PUSH
 		}
@@ -553,6 +514,7 @@ class Map {
 			}
 		}
 	}
+
 
 	getContent(latlng) {
 		let array = latlng.toString().slice(7, -2).split(', ');
@@ -780,6 +742,22 @@ class Map {
 		this.maxedout = true;
 		alert('acabou com ' + n + ' caches adicionadas')
 	}
+
+	moveCache(cache, lat, lng) {
+		if (this.validCloseLocations(lat, lng) && this.validFarLocations(lat, lng)){
+			cache.setNewPosition(lat, lng);
+		} else {
+			alert('Invalid Position');
+		}
+	}
+
+	getNumAddedCaches(){
+        return this.addedCaches.length;
+    }
+
+    getNumOriginalCaches() {
+        return this.caches.length;
+    }
 }
 
 
@@ -818,3 +796,19 @@ function addAllAutoCaches(){
 	map.addAllAutoCaches();
 }
 
+function chanceLocation(cache, lat, lng){
+		map.moveCache(cache, lat, lng);
+	
+}
+
+function getNumAddedCaches() {
+    return map.getNumAddedCaches();
+}
+
+function getNumOriginalCaches() {
+    return map.getNumOriginalCaches();
+}
+
+function getPercentageOriginalCaches(){
+    return map.getPercentageOriginalCaches();
+}
