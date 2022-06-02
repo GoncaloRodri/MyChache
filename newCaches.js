@@ -206,13 +206,10 @@ class Cache extends POI {
 }
 
 function openGeocaching(code) {
-	alert("Going to geocaching");
 	document.location = "https://coord.info/".concat(code);
 }
 
-//funcional mas nao quer trabalhar
 function openStreetView(latitude, longitude) {
-	alert("Going to street view");
 	document.location = "http://maps.google.com/maps?layer=c&cbll=".concat(latitude, ",", longitude);
 }
 /* CHACE SUB CLASSES */
@@ -470,7 +467,8 @@ class Map {
 		this.minLat = Number.MAX_VALUE;
 		this.minLng = Number.MAX_VALUE;
 		this.maxLat = Number.MIN_VALUE;
-		this.maxLng = Number.MIN_VALUE;
+		this.maxLng = Number.MIN_SAFE_INTEGER;
+		this.maxedout = false;
 
 	}
 
@@ -493,7 +491,7 @@ class Map {
 	}
 
 	validFarLocations(lat, lng) {
-		let allCaches = this.caches.concat(this.addedCaches);
+		let allCaches = this.caches;
 		let ca;
 		let lati;
 		let lngo;
@@ -510,13 +508,13 @@ class Map {
 		return false;
 	}
 
-	addNewCache(lat, lng, color) {
+	addNewCache(name, lat, lng, color) {
 		if (this.validCloseLocations(lat, lng) && this.validFarLocations(lat, lng)) {
 			let txt =
 				`<cache>
 		  <code>UNKNOWN</code>
-		  <name>UNKNOWN</name>
-		  <owner>UNKNOWN</owner>
+		  <name>${name}</name>
+		  <owner>User</owner>
 		  <latitude>${lat}</latitude>
 		  <longitude>${lng}</longitude>
 		  <altitude>-32768</altitude>
@@ -566,24 +564,31 @@ class Map {
         <P>
         <INPUT TYPE="button" VALUE="Street view" ONCLICK="openStreetView('${latitude}', '${longitude}');">
         <P>
-        <INPUT TYPE="button" VALUE="Create new Cache" ONCLICK="addManualCache('${latitude}', '${longitude}');">
+        <INPUT TYPE="text" ID="name" PLACEHOLDER="Insert name" >
+        <P>
+        <INPUT TYPE="button" VALUE="Create new Cache" ONCLICK="addManualCache(form.name.value, '${latitude}', '${longitude}');">
      	</FORM>`
 		return form;
 	}
 
 	addAutoCache() {
-		alert('antes let value');
-		let value = false;
-		alert('antes while');
-		while (!value) {
-			let lat = (Math.random() * (this.maxLat - this.minLat)) + this.minLat;
-			let lng = (Math.random() * (this.maxLng - this.minLng)) + this.minLng;
-			//!ESTES LAT E LNG ESTÃO ERRADOS ACHO EU
-			if (this.validCloseLocations(lat, lng) && this.validFarLocations(lat, lng)) {
-				alert(lat);
-				alert(lng);
-				this.addNewCache(lat, lng, 'blue');
-				value = true;
+		if(this.maxedout) 
+			alert('No more space to place caches!');
+		else {
+			let value = false;
+			let lat;
+			let lng;
+			let minLatN = parseFloat(this.minLat);
+			let maxLatN = parseFloat(this.maxLat);
+			let minLngN = parseFloat(this.minLng);
+			let maxLngN = parseFloat(this.maxLng);
+			while (!value) {
+				lat = (Math.random() * (maxLatN - minLatN)) + minLatN;
+				lng = (Math.random() * (maxLngN - minLngN)) + minLngN;
+				if (this.validCloseLocations(lat, lng) && this.validFarLocations(lat, lng)) {
+					this.addNewCache('Automatic',lat, lng, 'blue');
+					value = true;
+				}
 			}
 		}
 	}
@@ -658,10 +663,9 @@ class Map {
 	getLimits() {
 		let lat = 0;
 		let lng = 0;
-		alert('Its time to rumble');
 		for (const element of this.caches) {
-			lat = element.getLatitude();
-			lng = element.getLongitude();
+			lat = parseFloat(element.getLatitude());
+			lng = parseFloat(element.getLongitude());
 			if (lat < this.minLat) {
 				this.minLat = lat;
 			} else if (lat > this.maxLat) {
@@ -687,7 +691,6 @@ class Map {
 			for (let i = 0; i < xs.length; i++) { // Ignore the disables caches
 				if (getFirstValueByTagName(xs[i], "status") === STATUS_ENABLED) {
 					kind = getFirstValueByTagName(xs[i], "kind");
-					//alert("KIND: " + kind);
 					switch (kind) {
 						case 'Traditional':
 							c = new Traditional(xs[i]);
@@ -754,6 +757,29 @@ class Map {
 		}
 		return this.lmap.on('click', handler2);
 	}
+
+	addAllAutoCaches() {
+		let n = 0;
+		 //- CACHE_MAX_RADIUS;
+		let finishLat = this.maxLat;// + CACHE_MAX_RADIUS;
+		let finishLng = this.maxLng;// + CACHE_MAX_RADIUS;
+
+		alert('tou');
+		for (let startingLat = this.minLat ;startingLat <= finishLat; startingLat += 0.00025) {
+			for(let startingLng = this.minLng;  startingLng <= finishLng; startingLng += 0.00025) {
+				if (this.validCloseLocations(startingLat,startingLng) && this.validFarLocations(startingLat,startingLng)) {
+					this.addNewCache('Automatic',startingLat, startingLng, 'blue');
+					n++;
+					if(n%100 === 0) {
+						alert(n);
+					}//
+				}
+				
+			}
+		}
+		this.maxedout = true;
+		alert('acabou com ' + n + ' caches adicionadas')
+	}
 }
 
 
@@ -775,8 +801,8 @@ function addAutoCache() {
 }
 
 
-function addManualCache(latitude, longitude) {
-	map.addNewCache(latitude, longitude, 'green');
+function addManualCache(nome, latitude, longitude) {
+	map.addNewCache(nome, latitude, longitude, 'green');
 }
 
 function txt2xml(txt) {
@@ -786,5 +812,9 @@ function txt2xml(txt) {
 
 function delTradCache(latitude, longitude) {
 	map.deleteCache(latitude, longitude);
+}
+
+function addAllAutoCaches(){
+	map.addAllAutoCaches();
 }
 

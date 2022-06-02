@@ -52,18 +52,38 @@ input { padding: 0; margin: 0;}
 
 
 
-<HR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="button" ID="addCache" VALUE="Add random Cache" ONCLICK="addAutoCache()"> <P></P>
-<HR> <P>&nbsp;&nbsp;&nbsp;&nbsp; <INPUT TYPE="number" INPUTMODE= "decimal" STEP="0.000001" ID="latitude" placeholder="Insert latitude"> </P>
-   <P>&nbsp;&nbsp;&nbsp;&nbsp; <INPUT TYPE="number" INPUTMODE= "decimal" STEP="0.000001" ID="longitude" placeholder="Insert longitude"> </P>
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="button" ID="addCache" VALUE="Add Traditional Cache" ONCLICK="addManualCache(latitude.value,longitude.value)"> <P></P>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="button" ID="addCache" VALUE="Delete Traditional Cache" ONCLICK="delTradCache(latitude.value,longitude.value)"> 
+<HR><P></P>  &nbsp;&nbsp;&nbsp;&nbsp;
+   <INPUT TYPE="button" ID="addCache" VALUE="Add random Cache" ONCLICK="addAutoCache()"> 
+
+<HR><p></p>  &nbsp;&nbsp;&nbsp;&nbsp;
+   <INPUT TYPE="button" ID="allAutoCache" VALUE="Add All Possible Caches" ONCLICK="addAllAutoCaches()"> 
+
+<HR> 
+   <P>&nbsp;&nbsp;&nbsp;&nbsp; 
+      <INPUT TYPE="text" ID="nome"  placeholder="Insert name"> </P>
+   <P>&nbsp;&nbsp;&nbsp;&nbsp; 
+      <INPUT TYPE="number" INPUTMODE= "decimal" STEP="0.000001" ID="latitude" placeholder="Insert latitude"> </P>
+   <P>&nbsp;&nbsp;&nbsp;&nbsp; 
+      <INPUT TYPE="number" INPUTMODE= "decimal" STEP="0.000001" ID="longitude" placeholder="Insert longitude"> </P>
+   &nbsp;&nbsp;&nbsp;&nbsp;
+      <INPUT TYPE="button" ID="addCache" VALUE="Add Traditional Cache" ONCLICK="addManualCache(nome.value, latitude.value, longitude.value)"> <P></P>
+&nbsp;&nbsp;&nbsp;&nbsp;
+      <INPUT TYPE="button" ID="addCache" VALUE="Delete Traditional Cache" ONCLICK="delTradCache(latitude.value,longitude.value)"> 
+
 <br />
 
 
 <HR><B>Statistics:</B>
-<BR />&nbsp;&nbsp;statistic1: <SPAN id='statistic1'>0</SPAN>
-
-<hr>
+   <BR />&nbsp;&nbsp;Number of original caches: <SPAN id='statistic1'>0</SPAN>
+   <P>
+      &nbsp;&nbsp;Number of added caches: <SPAN id='statistic2'>0</SPAN>
+   <P>
+      &nbsp;&nbsp;Percentage of original caches: <SPAN id='statistic3'>0</SPAN>
+   <P>
+      &nbsp;&nbsp;Percentage of manually added caches: <SPAN id='statistic4'>>0</SPAN>
+   <P>
+      &nbsp;&nbsp;Percentage of Automatically added caches: <SPAN id='statistic5'>>0</SPAN>
+      <hr>
 </DIV>
 
 
