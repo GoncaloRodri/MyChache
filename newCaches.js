@@ -49,6 +49,8 @@ const CACHE_KINDS = ["CITO", "Earthcache", "Event",
 	"Traditional", "Virtual", "Webcam", "Wherigo"];
 const CACHE_RADIUS =
 	161	// meters
+const CACHE_MAX_RADIUS =
+	400	// meters
 const CACHES_FILE_NAME =
 	"caches.xml";
 const STATUS_ENABLED =
@@ -193,6 +195,14 @@ class Cache extends POI {
 
 		return form;
 	}
+
+	getLatitude() {
+		return this.latitude;
+	}
+
+	getLongitude() {
+		return this.longitude;
+	}
 }
 
 function openGeocaching(code) {
@@ -234,7 +244,7 @@ class PhysicalCache extends Cache {
 		<H3>I'm the marker of the cache ${name} </H3>
 		<P>
 		<b> Latitude: </b> ${latitude} <p>  
-		<b> Longitude: </b> ${longitude} '<p> 
+		<b> Longitude: </b> ${longitude} <p> 
 		<b> Owner: </b>${owner} <p>  
 		<b> Size: </b> ${size} <p> 
 		<b> Difficulty: </b> ${difficulty} <p> 
@@ -269,7 +279,6 @@ class Traditional extends PhysicalCache {
 	constructor(xml) {
 		super(xml);
 	}
-
 }
 
 /*
@@ -452,31 +461,115 @@ class Map {
 		this.addBaseLayers(MAP_LAYERS);
 		this.icons = this.loadIcons(RESOURCES_DIR);
 		this.caches = [];
+		this.addedCaches = [];
 		this.addClickHandler(e =>
 			L.popup()
 				.setLatLng(e.latlng)
-				.setContent("You clicked the map at " + e.latlng.toString() +
-					'<button OnClick= openStreetView()"">Street View</button>' + '&nbsp;&nbsp;&nbsp;&nbsp;'
-					+ '<button OnClick="createNewCache(e.latlng.toString())">Create New Cache</button>')
+				.setContent(this.getContent(e.latlng))
 		);
+		// "You clicked the map at " + e.latlng.toString() +
+		//'<button OnClick= openStreetView()"">Street View</button>' + '&nbsp;&nbsp;&nbsp;&nbsp;'
+		//+ '<button OnClick="createNewCache(e.latlng.toString())">Create New Cache</button>'
 
 		// ! Fazer split de latlng para ter latitude e longitude, e introduzir nos argumentos
 		// ! Fazer um form
 	}
 
+	validCloseLocations(lat, lng) {
+		let allCaches = this.caches.concat(this.addedCaches);
+		let ca;
+		let lati;
+		let lngo;
+		let distance;
+		for (let i = 0; i < allCaches.length; i++) {
+			ca = allCaches[i];
+			lati = ca.getLatitude();
+			lngo = ca.getLongitude();
+			distance = haversine(lat, lng, lati, lngo) * 1000;
+			if (distance < CACHE_RADIUS) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	validFarLocations(lat, lng) {
+		let allCaches = this.caches.concat(this.addedCaches);
+		let ca;
+		let lati;
+		let lngo;
+		let distance;
+		for (let i = 0; i < allCaches.length; i++) {
+			ca = allCaches[i];
+			lati = ca.getLatitude();
+			lngo = ca.getLongitude();
+			distance = haversine(lat, lng, lati, lngo) * 1000;
+			if (distance < CACHE_MAX_RADIUS) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	addNewCache(lat, lng, color) {		
+		if (this.validCloseLocations(lat, lng) && this.validFarLocations(lat, lng)) {
+			let txt =
+				`<cache>
+		  <code>UNKNOWN</code>
+		  <name>UNKNOWN</name>
+		  <owner>UNKNOWN</owner>
+		  <latitude>${lat}</latitude>
+		  <longitude>${lng}</longitude>
+		  <altitude>-32768</altitude>
+		  <kind>Traditional</kind>
+		  <size>UNKNOWN</size>
+		  <difficulty>1</difficulty>
+		  <terrain>1</terrain>
+		  <favorites>0</favorites>
+		  <founds>0</founds>
+		  <not_founds>0</not_founds>
+		  <state>UNKNOWN</state>
+		  <county>UNKNOWN</county>
+		  <publish>2000/01/01</publish>
+		  <status>E</status>
+		  <last_log>2000/01/01</last_log>
+		</cache>`;
+			let xml = txt2xml(txt);
+			let c = new Traditional(xml);
+			c.installCircle(CACHE_RADIUS, color);
+			this.addedCaches.push(c); //!! NAO ESTA A FAZER PUSH
+		}
+		else {
+			alert("Invalid location");
+		}
+	}
+
+	deleteCache(lat, lng) {	
+		for(let i = 0; i < this.addedCaches.length; i++) {
+			if(this.addedCaches[i].getLatitude() == lat && this.addedCaches[i].getLongitude() == lng) {
+				//this.remove(this.addedCaches[i].marker);
+				this.remove(this.adddedCaches[i]);
+				this.addedCaches.splice(i, 1);
+			}
+			else {
+				alert("Invalid location");
+			}
+		}
+	}
+
 	getContent(latlng) {
-		let array = latlng.split(', ');
-		let lat = array[0];
-		let lng = array[1];
+		let array = latlng.toString().slice(7, -2).split(', ');
+		let latitude = array[0];
+		let longitude = array[1];;
 		let form = `<FORM>
-		<b> Latitude: </b> ${latitude} <p>  
-		<b> Longitude: </b> ${longitude} '
-		<P>
-		<INPUT TYPE="button" VALUE="Street view" ONCLICK="openStreetView('${latitude}', '${longitude}');">
-		<P>
-		<INPUT TYPE="button" VALUE="Create new Cache" ONCLICK="changeLocation(${this});">
-	 </FORM>`
-		return form;
+        <b> Latitude: </b> ${latitude} <p>  
+        <b> Longitude: </b> ${longitude} 
+        <P>
+        <INPUT TYPE="button" VALUE="Street view" ONCLICK="openStreetView('${latitude}', '${longitude}');">
+        <P>
+        <INPUT TYPE="button" VALUE="Create new Cache" ONCLICK="addManualCache('${latitude}', '${longitude}');">
+     	</FORM>`
+        return form;
 	}
 
 	populate() {
@@ -587,7 +680,9 @@ class Map {
 							caches.push(new Virtual(xs[i]));
 							break;
 						case 'Letterbox':
-							caches.push(new Letterbox(xs[i]));
+							c = new Letterbox(xs[i]);
+							c.installCircle(CACHE_RADIUS, 'red');
+							caches.push(c);
 							break;
 						case 'Mega':
 							caches.push(new Mega(xs[i]));
@@ -645,11 +740,16 @@ function addAutoCache() {
 
 }
 
-function addManualCache() {
-
+function addManualCache(latitude, longitude) {
+	map.addNewCache(latitude, longitude, 'green');
 }
 
-function delTradCache() {
+function txt2xml(txt) {
+	let parser = new DOMParser();
+	return parser.parseFromString(txt, "text/xml");
+}
 
+function delTradCache(latitude, longitude) {
+	map.deleteCache(latitude, longitude);
 }
 
