@@ -547,8 +547,8 @@ class Map {
 	deleteCache(lat, lng) {	
 		for(let i = 0; i < this.addedCaches.length; i++) {
 			if(this.addedCaches[i].getLatitude() == lat && this.addedCaches[i].getLongitude() == lng) {
-				//this.remove(this.addedCaches[i].marker);
-				this.remove(this.adddedCaches[i]);
+				this.remove(this.addedCaches[i].marker);
+				this.remove(this.addedCaches[i].circle);
 				this.addedCaches.splice(i, 1);
 			}
 			else {
