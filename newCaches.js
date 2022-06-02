@@ -511,7 +511,7 @@ class Map {
 		return false;
 	}
 
-	addNewCache(lat, lng, color) {		
+	addNewCache(lat, lng, color) {
 		if (this.validCloseLocations(lat, lng) && this.validFarLocations(lat, lng)) {
 			let txt =
 				`<cache>
@@ -544,9 +544,9 @@ class Map {
 		}
 	}
 
-	deleteCache(lat, lng) {	
-		for(let i = 0; i < this.addedCaches.length; i++) {
-			if(this.addedCaches[i].getLatitude() == lat && this.addedCaches[i].getLongitude() == lng) {
+	deleteCache(lat, lng) {
+		for (let i = 0; i < this.addedCaches.length; i++) {
+			if (this.addedCaches[i].getLatitude() == lat && this.addedCaches[i].getLongitude() == lng) {
 				this.remove(this.addedCaches[i].marker);
 				this.remove(this.addedCaches[i].circle);
 				this.addedCaches.splice(i, 1);
@@ -569,7 +569,23 @@ class Map {
         <P>
         <INPUT TYPE="button" VALUE="Create new Cache" ONCLICK="addManualCache('${latitude}', '${longitude}');">
      	</FORM>`
-        return form;
+		return form;
+	}
+
+	addAutoCache() {
+		alert('antes let value');
+		let value = false;
+		alert('antes while');
+		while (!value) {
+			let lat = (Math.random() * (this.maxLat - this.minLat)) + this.minLat;
+			let lng = (Math.random() * (this.maxLng - this.minLng)) + this.minLng;
+			alert(lat);
+			alert(lng);
+			if (this.validCloseLocations(lat, lng) && this.validFarLocations(lat, lng)) {
+				this.addNewCache(lat, lng, 'blue');
+				value = true;
+			}
+		}
 	}
 
 	populate() {
@@ -638,6 +654,31 @@ class Map {
 		return icons;
 	}
 
+	getLimits() {
+		let lat;
+		let lng;
+		this.minLat = Number.MAX_VALUE;
+		this.minLng = Number.MAX_VALUE;
+		this.maxLat = Number.MIN_VALUE;
+		this.maxLng = Number.MIN_VALUE;
+		for (let i = 0; i < this.caches.length; i++) {
+			lat = this.caches[i].getLatitude();
+			lng = this.caches[i].getLongitude();
+			if (lat < minLat) {
+				this.minLat = lat;
+			}
+			if (lng < minLng) {
+				this.minLng = lng;
+			}
+			if (lat > maxLat) {
+				this.maxLat = lat;
+			}
+			if (lng > maxLng) {
+				this.maxLng = lng;
+			}
+		}
+	}
+
 	loadCaches(filename) {
 		let xmlDoc = loadXMLDoc(filename);
 		let xs = getAllValuesByTagName(xmlDoc, "cache");
@@ -702,9 +743,6 @@ class Map {
 		return caches;
 	}
 
-
-
-
 	add(marker) {
 		marker.addTo(map.lmap);
 	}
@@ -733,12 +771,13 @@ function onLoad() {
 	map = new Map(MAP_INITIAL_CENTRE, MAP_INITIAL_ZOOM);
 	map.showFCT();
 	map.populate();
-
+	map.getLimits();
 }
 
 function addAutoCache() {
-
+	map.addAutoCache()
 }
+
 
 function addManualCache(latitude, longitude) {
 	map.addNewCache(latitude, longitude, 'green');
