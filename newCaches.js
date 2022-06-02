@@ -467,12 +467,11 @@ class Map {
 				.setLatLng(e.latlng)
 				.setContent(this.getContent(e.latlng))
 		);
-		// "You clicked the map at " + e.latlng.toString() +
-		//'<button OnClick= openStreetView()"">Street View</button>' + '&nbsp;&nbsp;&nbsp;&nbsp;'
-		//+ '<button OnClick="createNewCache(e.latlng.toString())">Create New Cache</button>'
+		this.minLat = Number.MAX_VALUE;
+		this.minLng = Number.MAX_VALUE;
+		this.maxLat = Number.MIN_VALUE;
+		this.maxLng = Number.MIN_VALUE;
 
-		// ! Fazer split de latlng para ter latitude e longitude, e introduzir nos argumentos
-		// ! Fazer um form
 	}
 
 	validCloseLocations(lat, lng) {
@@ -579,9 +578,10 @@ class Map {
 		while (!value) {
 			let lat = (Math.random() * (this.maxLat - this.minLat)) + this.minLat;
 			let lng = (Math.random() * (this.maxLng - this.minLng)) + this.minLng;
-			alert(lat);
-			alert(lng);
+			//!ESTES LAT E LNG ESTÃO ERRADOS ACHO EU
 			if (this.validCloseLocations(lat, lng) && this.validFarLocations(lat, lng)) {
+				alert(lat);
+				alert(lng);
 				this.addNewCache(lat, lng, 'blue');
 				value = true;
 			}
@@ -654,26 +654,22 @@ class Map {
 		return icons;
 	}
 
+	//FEITO 
 	getLimits() {
-		let lat;
-		let lng;
-		this.minLat = Number.MAX_VALUE;
-		this.minLng = Number.MAX_VALUE;
-		this.maxLat = Number.MIN_VALUE;
-		this.maxLng = Number.MIN_VALUE;
-		for (let i = 0; i < this.caches.length; i++) {
-			lat = this.caches[i].getLatitude();
-			lng = this.caches[i].getLongitude();
-			if (lat < minLat) {
+		let lat = 0;
+		let lng = 0;
+		alert('Its time to rumble');
+		for (const element of this.caches) {
+			lat = element.getLatitude();
+			lng = element.getLongitude();
+			if (lat < this.minLat) {
 				this.minLat = lat;
-			}
-			if (lng < minLng) {
-				this.minLng = lng;
-			}
-			if (lat > maxLat) {
+			} else if (lat > this.maxLat) {
 				this.maxLat = lat;
 			}
-			if (lng > maxLng) {
+			if (lng < this.minLng) {
+				this.minLng = lng;
+			} else if (lng > this.maxLng) {
 				this.maxLng = lng;
 			}
 		}
