@@ -249,8 +249,6 @@ class PhysicalCache extends Cache {
 		<INPUT TYPE="button" VALUE="Geocaching" ONCLICK="openGeocaching('${code}');">
 		<P>
 		<INPUT TYPE="button" VALUE="Street view" ONCLICK="openStreetView('${latitude}', '${longitude}');">
-		<P>
-		<INPUT TYPE="button" VALUE="Change location" ONCLICK="changeLocation(${this});">
 	 </FORM>`
 
 		return form;
@@ -332,7 +330,7 @@ class Multi extends PhysicalCache {
 		<P>
 		<INPUT TYPE="text" ID="lat" PLACEHOLDER="Insert new Latitude"><p>
 		<INPUT TYPE="text" ID="lon" PLACEHOLDER="Insert new Longitude"><p>
-		<INPUT TYPE="button" VALUE="Change location" ONCLICK=" changeLocation(${cache}, form.lat.value, form.lon.value);">
+		<INPUT TYPE="button" VALUE="Change location" ONCLICK=' alert("ola");changeLocation();'>
 	 </FORM>`
 
 		return form;
@@ -732,9 +730,6 @@ class Map {
 				if (this.validCloseLocations(startingLat,startingLng) && this.validFarLocations(startingLat,startingLng)) {
 					this.addNewCache('Automatic',startingLat, startingLng, 'blue');
 					n++;
-					if(n%100 === 0) {
-						alert(n);
-					}//
 				}
 				
 			}
@@ -796,8 +791,10 @@ function addAllAutoCaches(){
 	map.addAllAutoCaches();
 }
 
-function chanceLocation(cache, lat, lng){
-		map.moveCache(cache, lat, lng);
+function changeLocation(cache, lat, lng){
+		alert("La padentro!");
+		alert(cache.getLatitude());
+		//map.moveCache(cache, lat, lng);
 	
 }
 
