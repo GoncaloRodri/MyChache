@@ -547,6 +547,7 @@ class Map {
 				lng = (Math.random() * (maxLngN - minLngN)) + minLngN;
 				if (this.validCloseLocations(lat, lng) && this.validFarLocations(lat, lng)) {
 					this.addNewCache('Automatic',lat, lng, 'blue');
+					this.lmap.flyTo(new L.LatLng(lat, lng));
 					value = true;
 				}
 			}
@@ -788,14 +789,14 @@ function delTradCache(latitude, longitude) {
 }
 
 function addAllAutoCaches(){
-	map.addAllAutoCaches();
+	map.addAllAutoCaches(); 
 }
 
 function changeLocation(cache, lat, lng){
-		alert("La padentro!");
 		alert(cache.getLatitude());
 		//map.moveCache(cache, lat, lng);
-	
+		map.addNewCache(cache.name, lat, lng);
+		map.delTradCache(cache.lat, cache.lng);
 }
 
 function getNumAddedCaches() {
