@@ -60,8 +60,8 @@ const STATUS_ENABLED =
 /* GLOBAL VARIABLES */
 
 let map = null;
-
-
+let cacheID = null;
+let numTradC = 0;
 
 /* USEFUL FUNCTIONS */
 
@@ -134,8 +134,10 @@ class POI {
 
 class Cache extends POI {
 	constructor(xml) {
+
 		super(xml);
 		this.installMarker();
+		this.id = cacheID++;
 	}
 
 	decodeXML(xml) {
@@ -161,11 +163,26 @@ class Cache extends POI {
 		this.last_log = new Date(getFirstValueByTagName(xml, "last_log"));
 	}
 
+	getID() {
+		return this.id;
+	}
+
+	getName() {
+		return this.name;
+	}
+
+	getAltitude() {
+		return this.altitude;
+	}
+
+	getFavorites() {
+		return this.favorites;
+	}
+
 	installMarker() {
 		let pos = [this.latitude, this.longitude];
 		this.marker = L.marker(pos, { icon: map.getIcon(this.kind) });
 		this.marker.bindTooltip(this.name);
-
 		this.marker.bindPopup(this.getPopupContent());
 		map.add(this.marker);
 	}
@@ -249,6 +266,10 @@ class PhysicalCache extends Cache {
 		<INPUT TYPE="button" VALUE="Geocaching" ONCLICK="openGeocaching('${code}');">
 		<P>
 		<INPUT TYPE="button" VALUE="Street view" ONCLICK="openStreetView('${latitude}', '${longitude}');">
+		<P>
+		<INPUT TYPE="text" ID="lat" PLACEHOLDER="Insert new Latitude"><p>
+		<INPUT TYPE="text" ID="lon" PLACEHOLDER="Insert new Longitude"><p>
+		<INPUT TYPE="button" VALUE="Change location" ONCLICK="changeLocation('${latitude}', '${longitude}', form.lat.value, form.lng.value);">
 	 </FORM>`
 
 		return form;
@@ -261,14 +282,8 @@ class Traditional extends PhysicalCache {
 	constructor(xml) {
 		super(xml);
 	}
-}
 
-class CustomTraditional extends Traditional {
-	constructor(xml) {
-		super(xml);
-	}
-
-	getPopupContent(){
+	getPopupContent() {
 		let name = this.name;
 		let latitude = this.latitude;
 		let longitude = this.longitude;
@@ -278,34 +293,29 @@ class CustomTraditional extends Traditional {
 		let code = this.code;
 		let form =
 			`<FORM>
-		<H3>I'm the marker of the cache ${name} </H3>
-		<P>
-		<b> Latitude: </b> ${latitude} <p>  
-		<b> Longitude: </b> ${longitude} <p> 
-		<b> Owner: </b>${owner} <p>  
-		<b> Size: </b> ${size} <p> 
-		<b> Difficulty: </b> ${difficulty} <p> 
-		<P>
-		<INPUT TYPE="button" VALUE="Geocaching" ONCLICK="openGeocaching('${code}');">
-		<P>
-		<INPUT TYPE="button" VALUE="Street view" ONCLICK="openStreetView('${latitude}', '${longitude}');">
-		<P>
-		<INPUT TYPE="button" VALUE="Delete Cache" ONCLICK="delTradCache('${latitude}', '${longitude}')">
-		<P>
-		<INPUT TYPE="button" VALUE="Change location" ONCLICK="changeLocation(${this});">
-	 </FORM>`
-	
+				<H></H>
+				<P>
+				I'm the marker of the cache <b> ${name} </b><p> 
+				<b> Latitude: </b> ${latitude} <p>  
+				<b> Longitude: </b> ${longitude} '<p> 
+				<b> Owner: </b>${owner} <p>  
+				<b> Size: </b> ${size} <p> 
+				<b> Difficulty: </b> ${difficulty} <p> 
+				<P>
+				<INPUT TYPE="button" VALUE="Geocaching" ONCLICK="openGeocaching('${code}');">
+				<INPUT TYPE="button" VALUE="Street view" ONCLICK="openStreetView('${latitude}', '${longitude}');">
+			 </FORM>`
+
 		return form;
 	}
 }
 
-
-class Multi extends PhysicalCache {
+class CustomTraditional extends Traditional {
 	constructor(xml) {
 		super(xml);
 	}
 
-	getPopupContent(){
+	getPopupContent() {
 		let name = this.name;
 		let latitude = this.latitude;
 		let longitude = this.longitude;
@@ -313,7 +323,6 @@ class Multi extends PhysicalCache {
 		let size = this.size;
 		let difficulty = this.difficulty;
 		let code = this.code;
-		let cache = this;
 		let form =
 			`<FORM>
 		<H3>I'm the marker of the cache ${name} </H3>
@@ -330,74 +339,14 @@ class Multi extends PhysicalCache {
 		<P>
 		<INPUT TYPE="text" ID="lat" PLACEHOLDER="Insert new Latitude"><p>
 		<INPUT TYPE="text" ID="lon" PLACEHOLDER="Insert new Longitude"><p>
-		<INPUT TYPE="button" VALUE="Change location" ONCLICK=' alert("ola");changeLocation();'>
+		<INPUT TYPE="button" VALUE="Change location" ONCLICK="alert('ola');"> <p>
+		<INPUT TYPE="button" VALUE="Delete Cache" ONCLICK="delTradCache('${latitude}', '${longitude}')">
+        <P>
 	 </FORM>`
 
 		return form;
 	}
 }
-
-class Mystery extends PhysicalCache {
-
-	constructor(xml) {
-		super(xml);
-	}
-}
-
-
-class Earthcache extends Cache {
-	constructor(xml) {
-		super(xml);
-	}
-}
-
-
-class Event extends Cache {
-	constructor(xml) {
-		super(xml);
-	}
-}
-
-
-class CITO extends Cache {
-	constructor(xml) {
-		super(xml);
-	}
-}
-
-
-class Mega extends Cache {
-	constructor(xml) {
-		super(xml);
-	}
-}
-
-class Letterbox extends PhysicalCache {
-	constructor(xml) {
-		super(xml);
-	}
-}
-
-class Virtual extends Cache {
-	constructor(xml) {
-		super(xml);
-	}
-}
-
-class Webcam extends Cache {
-	constructor(xml) {
-		super(xml);
-	}
-}
-
-class Wherigo extends Cache {
-	constructor(xml) {
-		super(xml);
-	}
-}
-
-
-
 
 class Place extends POI {
 	constructor(name, pos) {
@@ -493,7 +442,9 @@ class Map {
 			let xml = txt2xml(txt);
 			let c = new CustomTraditional(xml);
 			c.installCircle(CACHE_RADIUS, color);
-			this.addedCaches.push(c); //!! NAO ESTA A FAZER PUSH
+			this.addedCaches.push(c); 
+			document.getElementById('statistic2').textContent++;
+			numTradC++;
 		}
 		else {
 			alert("Invalid location");
@@ -506,6 +457,8 @@ class Map {
 				this.remove(this.addedCaches[i].marker);
 				this.remove(this.addedCaches[i].circle);
 				this.addedCaches.splice(i, 1);
+				document.getElementById('statistic2').textContent--;
+				numTradC--;
 			}
 			else {
 				alert("Invalid location");
@@ -532,7 +485,7 @@ class Map {
 	}
 
 	addAutoCache() {
-		if(this.maxedout) 
+		if (this.maxedout)
 			alert('No more space to place caches!');
 		else {
 			let value = false;
@@ -546,7 +499,7 @@ class Map {
 				lat = (Math.random() * (maxLatN - minLatN)) + minLatN;
 				lng = (Math.random() * (maxLngN - minLngN)) + minLngN;
 				if (this.validCloseLocations(lat, lng) && this.validFarLocations(lat, lng)) {
-					this.addNewCache('Automatic',lat, lng, 'blue');
+					this.addNewCache('Automatic', lat, lng, 'blue');
 					this.lmap.flyTo(new L.LatLng(lat, lng));
 					value = true;
 				}
@@ -556,6 +509,7 @@ class Map {
 
 	populate() {
 		this.caches = this.loadCaches(RESOURCES_DIR + CACHES_FILE_NAME);
+		updateStats();
 	}
 
 	showFCT() {
@@ -646,6 +600,10 @@ class Map {
 		let caches = [];
 		let kind = '';
 		let c;
+		let highest = 0;
+		let highName;
+		let favName;
+		let favs = 0;
 		if (xs.length === 0)
 			alert("Empty cache file");
 		else {
@@ -657,48 +615,30 @@ class Map {
 							c = new Traditional(xs[i]);
 							c.installCircle(CACHE_RADIUS, 'red');
 							caches.push(c);
+							numTradC++;
 							break;
 						case 'Multi':
-							c = new Multi(xs[i]);
-							c.installCircle(CACHE_RADIUS, 'red');
-							caches.push(c);
-							break;
 						case 'Mystery':
-							c = new Mystery(xs[i]);
-							c.installCircle(CACHE_RADIUS, 'red');
-							caches.push(c);
-							break;
-						case 'Earthcache':
-							caches.push(new Earthcache(xs[i]));
-							break;
-						case 'Event':
-							caches.push(new Event(xs[i]));
-							break;
-						case 'CITO':
-							caches.push(new CITO(xs[i]));
-							break;
-						case 'Virtual':
-							caches.push(new Virtual(xs[i]));
-							break;
 						case 'Letterbox':
-							c = new Letterbox(xs[i]);
+							c = new PhysicalCache(xs[i]);
 							c.installCircle(CACHE_RADIUS, 'red');
 							caches.push(c);
-							break;
-						case 'Mega':
-							caches.push(new Mega(xs[i]));
-							break;
-						case 'Webcam':
-							caches.push(new Webcam(xs[i]));
-							break;
-						case 'Wherigo':
-							caches.push(new Wherigo(xs[i]));
 							break;
 						default:
 							caches.push(new Cache(xs[i]));
 					}
+					document.getElementById('statistic1').textContent++;
+					if(c.getAltitude() >highest) {
+						highest = c.getAltitude();
+						highName = c.getName();
+					}
+					if(c.getFavorites() > favs) {
+						favs = c.getFavorites();
+						favName = c.getName();
+					}
 				}
-			}
+			} document.getElementById('statistic5').textContent = highName;
+			document.getElementById('statistic6').textContent = favName;
 		}
 		return caches;
 	}
@@ -721,18 +661,18 @@ class Map {
 
 	addAllAutoCaches() {
 		let n = 0;
-		 //- CACHE_MAX_RADIUS;
+		//- CACHE_MAX_RADIUS;
 		let finishLat = this.maxLat;// + CACHE_MAX_RADIUS;
 		let finishLng = this.maxLng;// + CACHE_MAX_RADIUS;
 
 		alert('tou');
-		for (let startingLat = this.minLat ;startingLat <= finishLat; startingLat += 0.00025) {
-			for(let startingLng = this.minLng;  startingLng <= finishLng; startingLng += 0.00025) {
-				if (this.validCloseLocations(startingLat,startingLng) && this.validFarLocations(startingLat,startingLng)) {
-					this.addNewCache('Automatic',startingLat, startingLng, 'blue');
+		for (let startingLat = this.minLat; startingLat <= finishLat; startingLat += 0.00025) {
+			for (let startingLng = this.minLng; startingLng <= finishLng; startingLng += 0.00025) {
+				if (this.validCloseLocations(startingLat, startingLng) && this.validFarLocations(startingLat, startingLng)) {
+					this.addNewCache('Automatic', startingLat, startingLng, 'blue');
 					n++;
 				}
-				
+
 			}
 		}
 		this.maxedout = true;
@@ -740,20 +680,20 @@ class Map {
 	}
 
 	moveCache(cache, lat, lng) {
-		if (this.validCloseLocations(lat, lng) && this.validFarLocations(lat, lng)){
+		if (this.validCloseLocations(lat, lng) && this.validFarLocations(lat, lng)) {
 			cache.setNewPosition(lat, lng);
 		} else {
 			alert('Invalid Position');
 		}
 	}
 
-	getNumAddedCaches(){
-        return this.addedCaches.length;
-    }
+	getNumAddedCaches() {
+		return this.addedCaches.length;
+	}
 
-    getNumOriginalCaches() {
-        return this.caches.length;
-    }
+	getNumOriginalCaches() {
+		return this.caches.length;
+	}
 }
 
 
@@ -771,12 +711,14 @@ function onLoad() {
 }
 
 function addAutoCache() {
-	map.addAutoCache()
+	map.addAutoCache();
+	updateStats();
 }
 
 
 function addManualCache(nome, latitude, longitude) {
 	map.addNewCache(nome, latitude, longitude, 'green');
+	updateStats();
 }
 
 function txt2xml(txt) {
@@ -786,27 +728,24 @@ function txt2xml(txt) {
 
 function delTradCache(latitude, longitude) {
 	map.deleteCache(latitude, longitude);
+	updateStats();
 }
 
-function addAllAutoCaches(){
-	map.addAllAutoCaches(); 
+function addAllAutoCaches() {
+	map.addAllAutoCaches();
+	updateStats();
 }
 
-function changeLocation(cache, lat, lng){
-		alert(cache.getLatitude());
-		//map.moveCache(cache, lat, lng);
-		map.addNewCache(cache.name, lat, lng);
-		map.delTradCache(cache.lat, cache.lng);
+function changeLocation(cache, lat, lng) {
+	alert(cache.getLatitude());
+	//map.moveCache(cache, lat, lng);
+	map.addNewCache(cache.name, lat, lng);
+	map.delTradCache(cache.lat, cache.lng);
 }
 
-function getNumAddedCaches() {
-    return map.getNumAddedCaches();
-}
-
-function getNumOriginalCaches() {
-    return map.getNumOriginalCaches();
-}
-
-function getPercentageOriginalCaches(){
-    return map.getPercentageOriginalCaches();
+function updateStats() {
+	let a = parseInt(document.getElementById('statistic1').textContent);
+	let b = parseInt(document.getElementById('statistic2').textContent);
+	document.getElementById('statistic3').textContent = ((a / (a+b))*100).toFixed(2);
+	document.getElementById('statistic4').textContent = ((numTradC / (a+b))*100).toFixed(2);
 }
