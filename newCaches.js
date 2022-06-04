@@ -128,7 +128,8 @@ const STATUS_ENABLED =
 /* GLOBAL VARIABLES */
 
 let map = null;
-let cacheID = null;
+
+/* Esta variavel foi criada para fins estatisticos e de simplicidade de codigo */
 let numTradC = 0;
 
 /* USEFUL FUNCTIONS */
@@ -231,6 +232,7 @@ class Cache extends POI {
 		this.last_log = new Date(getFirstValueByTagName(xml, "last_log"));
 	}
 
+	/* Metodos adicionados */
 	getID() {
 		return this.id;
 	}
@@ -246,15 +248,18 @@ class Cache extends POI {
 	getFavorites() {
 		return this.favorites;
 	}
-
-	installMarker() {
-		let pos = [this.latitude, this.longitude];
-		this.marker = L.marker(pos, { icon: map.getIcon(this.kind) });
-		this.marker.bindTooltip(this.name);
-		this.marker.bindPopup(this.getPopupContent());
-		map.add(this.marker);
+	
+	getLatitude() {
+		return this.latitude;
 	}
 
+	getLongitude() {
+		return this.longitude;
+		
+	}
+		/* Metodo criado para simplificar e melhorar a leitura do metodo installMarker 
+		tal como melhorar a extensibilidade do codigo visto que este metodo é modificado
+	pelas subclasses desta class e permite que o metodo installMarker permaneça inalterado */
 	getPopupContent() {
 		let name = this.name;
 		let latitude = this.latitude;
@@ -276,27 +281,23 @@ class Cache extends POI {
 				<P>
 				<INPUT TYPE="button" VALUE="Geocaching" ONCLICK="openGeocaching('${code}');">
 				<INPUT TYPE="button" VALUE="Street view" ONCLICK="openStreetView('${latitude}', '${longitude}');">
-			 </FORM>`
+				</FORM>`
+				
+				return form;
+		
+			
+		}
 
-		return form;
-	}
-
-	getLatitude() {
-		return this.latitude;
-	}
-
-	getLongitude() {
-		return this.longitude;
-	}
+		installMarker() {
+			let pos = [this.latitude, this.longitude];
+			this.marker = L.marker(pos, { icon: map.getIcon(this.kind) });
+			this.marker.bindTooltip(this.name);
+			this.marker.bindPopup(this.getPopupContent());
+			map.add(this.marker);
+		}
 }
 
-function openGeocaching(code) {
-	document.location = "https://coord.info/".concat(code);
-}
 
-function openStreetView(latitude, longitude) {
-	document.location = "http://maps.google.com/maps?layer=c&cbll=".concat(latitude, ",", longitude);
-}
 /* CHACE SUB CLASSES */
 
 /*
@@ -658,7 +659,8 @@ class Map {
 		return icons;
 	}
 
-	//FEITO 
+	/* Metodo criado para estabelecer os limites da longitude e latitude permitidos
+	e para facilitar a leitura*/
 	getLimits() {
 		let lat = 0;
 		let lng = 0;
@@ -678,6 +680,10 @@ class Map {
 		}
 	}
 
+
+	/* Este metodo foi modificado com a implementação de um switch para permitir a diferenciação 
+	dos tipos de caches logo na sua criação e adição ao programa tal como a determinaçao de 
+	algumas variaveis com fins estatisticos */
 	loadCaches(filename) {
 		let xmlDoc = loadXMLDoc(filename);
 		let xs = getAllValuesByTagName(xmlDoc, "cache");
@@ -743,6 +749,7 @@ class Map {
 		return this.lmap.on('click', handler2);
 	}
 
+	/* Metodo criao para gerar o maximo de caches criadas automaticamente possivel */
 	addAllAutoCaches() {
 		let n = 0;
 		//- CACHE_MAX_RADIUS;
@@ -763,21 +770,6 @@ class Map {
 		alert('acabou com ' + n + ' caches adicionadas')
 	}
 
-	moveCache(cache, lat, lng) {
-		if (this.validCloseLocations(lat, lng) && this.validFarLocations(lat, lng)) {
-			cache.setNewPosition(lat, lng);
-		} else {
-			alert('Invalid Position');
-		}
-	}
-
-	getNumAddedCaches() {
-		return this.addedCaches.length;
-	}
-
-	getNumOriginalCaches() {
-		return this.caches.length;
-	}
 }
 
 
@@ -794,12 +786,13 @@ function onLoad() {
 	map.getLimits();
 }
 
+/* Função que adiciona uma cache automaticamente e atualiza a estatistica */
 function addAutoCache() {
 	map.addAutoCache();
 	updateStats();
 }
 
-
+/* Função que adiciona uma cache manualmente e atualiza a estatistica */
 function addManualCache(nome, latitude, longitude) {
 	map.addNewCache(nome, latitude, longitude, 'green');
 	updateStats();
@@ -810,26 +803,33 @@ function txt2xml(txt) {
 	return parser.parseFromString(txt, "text/xml");
 }
 
+/* Função que elimina uma cache e atualiza a estatistica */
 function delTradCache(latitude, longitude) {
 	map.deleteCache(latitude, longitude);
 	updateStats();
 }
 
+
+/* Função que adiciona o maximo de caches possiveis, automaticamente */
 function addAllAutoCaches() {
 	map.addAllAutoCaches();
 	updateStats();
 }
 
-function changeLocation(cache, lat, lng) {
-	alert(cache.getLatitude());
-	//map.moveCache(cache, lat, lng);
-	map.addNewCache(cache.name, lat, lng);
-	map.delTradCache(cache.lat, cache.lng);
-}
-
+/* Função que atualiza a estatistica */
 function updateStats() {
 	let a = parseInt(document.getElementById('statistic1').textContent);
 	let b = parseInt(document.getElementById('statistic2').textContent);
 	document.getElementById('statistic3').textContent = ((a / (a+b))*100).toFixed(2);
 	document.getElementById('statistic4').textContent = ((numTradC / (a+b))*100).toFixed(2);
+}
+
+/* Funçao que redireciona a pagina atual para uma pagina geocaching */
+function openGeocaching(code) {
+	document.location = "https://coord.info/".concat(code);
+}
+
+/* Função que redireciona a pagina atual para uma pagina do google maps, em modo street view*/
+function openStreetView(latitude, longitude) {
+	document.location = "http://maps.google.com/maps?layer=c&cbll=".concat(latitude, ",", longitude);
 }
