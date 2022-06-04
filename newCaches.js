@@ -1,10 +1,7 @@
 /* New Caches
-
 Aluno 1: 59837 Bárbara Correia
 Aluno 2: 60044 Gonçalo Rodrigues 
-
 Comment:
-
 Das 6 'features' pedidas, 5 delas foram completamente implementadas:
 	
 	1.	Das caches criadas, as derivadas da tradução do xml sao criadas com um circulo de 
@@ -15,17 +12,12 @@ Das 6 'features' pedidas, 5 delas foram completamente implementadas:
 	caches possiveis, sao criadas com um circulo de cor verde. Todas as outras caches que nao tenham
 	localização fisica ou que nao correspondam as caches dos tipos: Traditional, Multi, LetterBox ou 
 	Mystery, sao criadas sem circulo colorido.
-
 	2. 	Ao 'clickar' num icon de uma cache varias opçoes aparecem:
-
 		0. 	Dados basicos sobre a cache como o nome, as coordenadas, o dono, o tamanho e a
 		dificuldade.
-
 		1.	É apresentado um botão que redireciona a pagina atual para a pagina geocaching da cache.
-
 		2. 	É também apresentado um botão que redireciona a pagina atual para do google maps nas 
 		coordenadas da cache, em modo street view.
-
 		3. Este ponto não foi implementado na sua totalidade. O objetivo de permitir mudar a 
 		localização de caches de tipo Multi, Mystery ou LetterBox e de caches Tradicionais criadas
 		manual ou automaticamente não foi alcançado. O grupo somente conseguiu implementar a 
@@ -39,23 +31,17 @@ Das 6 'features' pedidas, 5 delas foram completamente implementadas:
 		criar uma cache nova com todas as informações que estas caches tem, o que se tornou bastante
 		complexo. Outra teria sido não eliminar e adicionar as caches mas sim tentar move-las no 
 		mapa sem termos de criar objetos de acordo com o xml base de tal cache.
-
 		4. 	Nas caches criadas manualmente ou automaticamente, é apresentado um botão que 
 		possibilita a remoção da cache.
-
 	3. 	Ao 'clickar' numa posição sem cache atribuida, aparece um pop up com as coordenadas e com
 	os seguintes botões: 
-
 		1. 	É apresentado um botão que redireciona a pagina atual para a pagina do google maps nas
 		respetivas coordenadas, em modo street view.
-
 		2.	É apresentado uma caixa input de text que juntamente com um botão que se segue permite 
 		adicionar uma cache nas respetivas coordenadas, caso não seja verificado nenhum impedimento
-
 	4. 	No canto inferior da aba posicionada na parte esquerda do ecrã, é possivel observar alguns
 	dados estatisticos interessantes (mediante a opinião do grupo), 
 	que são atualizados em "tempo real".
-
 	5. 	No mesmo painel referido no ponto 4, é apresentado um botão que permite gerar um ponto 
 	aleatório no mapa, com recurso a numeros pseudo-aleatorios.
 	
@@ -64,25 +50,15 @@ Das 6 'features' pedidas, 5 delas foram completamente implementadas:
 	161 metros de qualquer cache e a distancia maxima de 400 metros de
 	pelo menos uma cache original.
 	   	Esta funcionalidade é realizada pelo seguintes passos:
-
 			1. Ao ser criado o mapa, são calculados os limites maximos e minimos da latitude e 
 			da longitude. (função getLimits())
-
 			2. Ao 'clickar' no botão, é chamada a função addAllAutoCaches() e de seguida o metodo, 
 			da classe map, addAllAutoCaches().
-
 			3. Neste metodo são usados 2 for's que correm o mapa como se fosse uma grelha. Um 'for' 
 			corresponde às latitudes possiveis e o outro às longitudes possiveis.
-
 			4. Com isto em cada combinação de latitude-longitude possivel é verificado sem é 
 			possivel adicionar uma cache e ,caso se verifique, uma cache é adicionada.
-
-
-
-
-
 0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
-
 HTML DOM documentation: https://www.w3schools.com/js/js_htmldom.asp
 Leaflet documentation: https://leafletjs.com/reference.html
 */
@@ -206,7 +182,6 @@ class Cache extends POI {
 
 		super(xml);
 		this.installMarker();
-		this.id = cacheID++;
 	}
 
 	decodeXML(xml) {
