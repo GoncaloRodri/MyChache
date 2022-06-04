@@ -419,6 +419,7 @@ class CustomTraditional extends Traditional {
 	}
 }
 
+/* Função que permite mudar a locatização de uma cache criada manual ou automaticamente */
 function changeCustomTradLocation(name, oldLat, oldLng, newLat, newLng) {
 	map.changeCustomTradLocation(name, oldLat, oldLng, newLat, newLng);
 }
@@ -447,6 +448,9 @@ class Map {
 				.setLatLng(e.latlng)
 				.setContent(this.getContent(e.latlng))
 		);
+
+		/* Limites criados para fins de resolução de problemas relacionados com a geração 
+		do maximo de caches possiveis*/
 		this.minLat = Number.MAX_VALUE;
 		this.minLng = Number.MAX_VALUE;
 		this.maxLat = Number.MIN_VALUE;
@@ -455,7 +459,7 @@ class Map {
 
 	}
 
-
+	/* Muda a localização de uma cache, adicionando e eliminado caches */
 	changeCustomTradLocation(name, oldLat, oldLng, newLat, newLng) {
 		if(this.addNewCache(name, newLat, newLng, 'green') === 1) {
 			this.deleteCache(parseFloat(oldLat), parseFloat(oldLng));
@@ -463,6 +467,8 @@ class Map {
 	}
 	
 
+	/* Verifica se uma cache esta muito perto ou nao, devolve se a cache estiver a mais 
+	de 161 metros de qualquer cache*/
 	validCloseLocations(lat, lng) {
 		let allCaches = this.caches.concat(this.addedCaches);
 		let ca;
@@ -481,6 +487,8 @@ class Map {
 		return true;
 	}
 
+	/* Verifica se uma cache esta muito longe ou nao, devolve se a cache estiver a menos 
+	de 400 metros de pelo menos 1 cache criada originalmente*/
 	validFarLocations(lat, lng) {
 		let allCaches = this.caches;
 		let ca;
@@ -499,6 +507,7 @@ class Map {
 		return false;
 	}
 
+	/* Adiciona uma cache no mapa */
 	addNewCache(name, lat, lng, color) {
 		if (this.validCloseLocations(lat, lng) && this.validFarLocations(lat, lng)) {
 			let txt =
@@ -536,6 +545,7 @@ class Map {
 		}
 	}
 
+	/* Elimina uma cache do mapa */
 	deleteCache(lat, lng) {
 		for (let i = 0; i < this.addedCaches.length; i++) {
 			if (this.addedCaches[i].getLatitude() == lat && this.addedCaches[i].getLongitude() == lng) {
@@ -786,6 +796,14 @@ function onLoad() {
 	map.getLimits();
 }
 
+function txt2xml(txt) {
+	let parser = new DOMParser();
+	return parser.parseFromString(txt, "text/xml");
+}
+
+
+// Funções Adicionadas
+
 /* Função que adiciona uma cache automaticamente e atualiza a estatistica */
 function addAutoCache() {
 	map.addAutoCache();
@@ -798,10 +816,6 @@ function addManualCache(nome, latitude, longitude) {
 	updateStats();
 }
 
-function txt2xml(txt) {
-	let parser = new DOMParser();
-	return parser.parseFromString(txt, "text/xml");
-}
 
 /* Função que elimina uma cache e atualiza a estatistica */
 function delTradCache(latitude, longitude) {
