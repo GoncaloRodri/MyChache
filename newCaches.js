@@ -17,18 +17,38 @@ Das 6 'features' pedidas, 5 delas foram completamente implementadas:
 	Mystery, sao criadas sem circulo colorido.
 
 	2. 	Ao 'clickar' num icon de uma cache varias opçoes aparecem:
+
 		0. 	Dados basicos sobre a cache como o nome, as coordenadas, o dono, o tamanho e a
 		dificuldade.
+
 		1.	É apresentado um botão que redireciona a pagina atual para a pagina geocaching da cache.
+
 		2. 	É também apresentado um botão que redireciona a pagina atual para do google maps nas 
 		coordenadas da cache, em modo street view.
+
+		3. Este ponto não foi implementado na sua totalidade. O objetivo de permitir mudar a 
+		localização de caches de tipo Multi, Mystery ou LetterBox e de caches Tradicionais criadas
+		manual ou automaticamente não foi alcançado. O grupo somente conseguiu implementar a 
+		funcionalidade de mudar a localização de caches criadas manual ou automaticamente,
+		criando e eliminando a cache em questão em vez de simplesmente mudar a sua localização, 
+		visto que para o grupo não é justificavel tal complexidade. O resto deste ponto não foi
+		implementado devido à falta de tempo assim como à falta de soluções simples e/ou de bom
+		codigo. Uma das opções que o grupo ponderou tomar, mas devido aos pontos acima referidos
+		não chegou a faze-lo, foi na class PhysicalCache, que engloba as caches dos tipos 
+		Multi, Mystery e LetterBox, modificar o metodo changePosition, visto que este necessita de
+		criar uma cache nova com todas as informações que estas caches tem, o que se tornou bastante
+		complexo. Outra teria sido não eliminar e adicionar as caches mas sim tentar move-las no 
+		mapa sem termos de criar objetos de acordo com o xml base de tal cache.
+
 		4. 	Nas caches criadas manualmente ou automaticamente, é apresentado um botão que 
 		possibilita a remoção da cache.
 
 	3. 	Ao 'clickar' numa posição sem cache atribuida, aparece um pop up com as coordenadas e com
 	os seguintes botões: 
+
 		1. 	É apresentado um botão que redireciona a pagina atual para a pagina do google maps nas
 		respetivas coordenadas, em modo street view.
+
 		2.	É apresentado uma caixa input de text que juntamente com um botão que se segue permite 
 		adicionar uma cache nas respetivas coordenadas, caso não seja verificado nenhum impedimento
 
@@ -44,24 +64,20 @@ Das 6 'features' pedidas, 5 delas foram completamente implementadas:
 	161 metros de qualquer cache e a distancia maxima de 400 metros de
 	pelo menos uma cache original.
 	   	Esta funcionalidade é realizada pelo seguintes passos:
+
 			1. Ao ser criado o mapa, são calculados os limites maximos e minimos da latitude e 
 			da longitude. (função getLimits())
+
 			2. Ao 'clickar' no botão, é chamada a função addAllAutoCaches() e de seguida o metodo, 
 			da classe map, addAllAutoCaches().
-			3. Neste metodo são usados 2 for's que correm o mapa como se fosse uma grelha. Um for 
+
+			3. Neste metodo são usados 2 for's que correm o mapa como se fosse uma grelha. Um 'for' 
 			corresponde às latitudes possiveis e o outro às longitudes possiveis.
+
 			4. Com isto em cada combinação de latitude-longitude possivel é verificado sem é 
 			possivel adicionar uma cache e ,caso se verifique, uma cache é adicionada.
 
- 
-	2.3 -> Este ponto não foi implementado
 
-
-The file "newCaches.js" must include, in the first lines,
-an opening comment containing: the name and number of the two students who
-developd the project; indication of which parts of the work
-made and which were not made; possibly alerts to some aspects of the
-implementation that may be less obvious to the teacher.
 
 
 
@@ -391,13 +407,19 @@ class CustomTraditional extends Traditional {
 		<P>
 		<INPUT TYPE="text" ID="lat" PLACEHOLDER="Insert new Latitude"><p>
 		<INPUT TYPE="text" ID="lon" PLACEHOLDER="Insert new Longitude"><p>
-		<INPUT TYPE="button" VALUE="Change location" ONCLICK="alert('ola');"> <p>
+		<INPUT TYPE="button" VALUE="Change location" 
+			ONCLICK="changeCustomTradLocation('${name} ',' ${latitude} ',' ${longitude} ',
+			 form.lat.value, form.lon.value);"> <p>
 		<INPUT TYPE="button" VALUE="Delete Cache" ONCLICK="delTradCache('${latitude}', '${longitude}')">
         <P>
 	 </FORM>`
 
 		return form;
 	}
+}
+
+function changeCustomTradLocation(name, oldLat, oldLng, newLat, newLng) {
+	map.changeCustomTradLocation(name, oldLat, oldLng, newLat, newLng);
 }
 
 class Place extends POI {
@@ -431,6 +453,14 @@ class Map {
 		this.maxedout = false;
 
 	}
+
+
+	changeCustomTradLocation(name, oldLat, oldLng, newLat, newLng) {
+		if(this.addNewCache(name, newLat, newLng, 'green') === 1) {
+			this.deleteCache(parseFloat(oldLat), parseFloat(oldLng));
+		}
+	}
+	
 
 	validCloseLocations(lat, lng) {
 		let allCaches = this.caches.concat(this.addedCaches);
@@ -497,9 +527,11 @@ class Map {
 			this.addedCaches.push(c); 
 			document.getElementById('statistic2').textContent++;
 			numTradC++;
+			return 1;
 		}
 		else {
 			alert("Invalid location");
+			return 0;
 		}
 	}
 
@@ -511,11 +543,11 @@ class Map {
 				this.addedCaches.splice(i, 1);
 				document.getElementById('statistic2').textContent--;
 				numTradC--;
+				return;
 			}
-			else {
-				alert("Invalid location");
-			}
+			
 		}
+		alert('Invalid Location');
 	}
 
 
